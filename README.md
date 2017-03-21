@@ -1,2 +1,2 @@
 # wasteroids
-Asteroids implementation in C
+Asteroids implementation in C.

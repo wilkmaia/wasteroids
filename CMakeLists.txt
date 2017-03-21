@@ -5,4 +5,4 @@ project (WAsteroids)
 set (WAsteroids_VERSION_MAJOR 0)
 set (WAsteroids_VERSION_MINOR 1)
 
-add_executable(wasteroids common.c main.c)
+add_executable(WAsteroids.out source/common.c source/main.c)

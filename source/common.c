@@ -52,7 +52,7 @@ Asteroid *(asteroids[ASTEROID_MAX]);
 int32 num_asteroids = 0;
 
 const float SHIP_DIMENSION = 20.0f;
-const float ASTEROID_DIMENSION = 15.0f;
+const float ASTEROID_DIMENSION = 20.0f;
 
 const float MAX_ANGLE = 2.0f * (float) ALLEGRO_PI;
 
@@ -195,11 +195,10 @@ void check_blasts_on_asteroids() {
         for (j = 0; j < num_asteroids; ++j) {
             // If they collide
             if (asteroid_check_collision_on_blast(asteroids[j], blasts[i])) {
-                // TODO
-                // asteroid_collided(asteroids[j]);
-                
-                // Deletes the objects
-                asteroid_delete(asteroids[j]);
+                // Handle the asteroid collision
+                asteroid_collided(asteroids[j]);
+
+                // Deletes blast
                 blast_delete(blasts[i]);
             }
         }

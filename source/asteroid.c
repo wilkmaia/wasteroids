@@ -294,7 +294,14 @@ void asteroid_populate(int32 n) {
     }
 }
 
-
+/**
+ * @brief      Checks if the asteroid and blast collided
+ *
+ * @param      asteroid  The asteroid
+ * @param      blast     The blast
+ *
+ * @return     true if collision detected; false otherwise
+ */
 bool asteroid_check_collision_on_blast(Asteroid *asteroid, Blast *blast) {
     // Blast's end point
     float x_blast;
@@ -318,4 +325,39 @@ bool asteroid_check_collision_on_blast(Asteroid *asteroid, Blast *blast) {
     }
 
     return false;
+}
+
+void asteroid_collided(Asteroid *asteroid) {
+    float direction;
+    float scale;
+    float x;
+    float y;
+
+    // It's time to say goodbye...
+    if (asteroid->scale <= 1) {
+        asteroid_delete(asteroid);
+        return;
+    }
+
+    // Otherwise...
+    // It gives birth to two smaller children before going away... forever
+    // Child 1
+    direction = asteroid->direction + ((rand()%101)-50.0f)/100.0f; // Some randomness inserted
+    scale = asteroid->scale / 2.0f;
+    x = asteroid->x + (rand()%100) - 50.0f;
+    y = asteroid->y + (rand()%100) - 50.0f;
+    asteroid_make_new_default(x, y, direction, scale);
+
+    // Child 2
+    direction = asteroid->direction + ((rand()%101)-50.0f)/100.0f; // Some randomness inserted
+    scale = asteroid->scale / 2.0f;
+    x = asteroid->x + (rand()%100) - 50.0f;
+    y = asteroid->y + (rand()%100) - 50.0f;
+    asteroid_make_new_default(x, y, direction, scale);
+
+    asteroid_delete(asteroid);
+}
+
+float asteroid_calc_speed(Asteroid *asteroid) {
+    return 5.0f - asteroid->scale;
 }

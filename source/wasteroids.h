@@ -233,7 +233,7 @@ typedef struct {
 /**
  * Max number of live blasts
  */
-#define ASTEROID_MAX 30
+#define ASTEROID_MAX 100
 #define ASTEROID_COLOR al_map_rgb(0, 0, 255)
 
 extern const float ASTEROID_DIMENSION;
@@ -252,6 +252,8 @@ void asteroid_delete_all();
 void asteroid_populate(int32 n);
 bool asteroid_check_collision_on_blast(Asteroid *asteroid, Blast *blast);
 void asteroid_get_corners(Asteroid *asteroid, float *x1, float *y1, float *x2, float *y2);
+void asteroid_collided(Asteroid *asteroid);
+float asteroid_calc_speed(Asteroid *asteroid);
 #endif // WAS_USING_BLAST
 
 

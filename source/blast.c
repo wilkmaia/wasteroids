@@ -32,6 +32,7 @@
  */
 
 #define WAS_USING_BLAST
+#define WAS_USING_SHIP
 #include "wasteroids.h"
 
 
@@ -83,12 +84,21 @@ Blast * blast_make_new(float x, float y, float direction, float size, float spee
     return newBlast;
 }
 
+/**
+ * @brief      Creates a new blast with default values
+ *
+ * @param[in]  x          starting x-coordinate
+ * @param[in]  y          starting y-coordinate
+ * @param[in]  direction  starting direction
+ *
+ * @return     Pointer to new blast
+ */
 Blast * blast_make_new_default(float x, float y, float direction) {
     Blast * newBlast;
     float size = 20.0f;
     float speed = 10.0f;
     bool alive = true;
-    ALLEGRO_COLOR color = al_map_rgb(255, 0, 0);
+    ALLEGRO_COLOR color = BLAST_COLOR;
     float thickness = 3.0f;
 
     newBlast = blast_make_new(x, y, direction, size, speed, alive,
@@ -134,6 +144,17 @@ int8 blast_draw(Blast *blast) {
 }
 
 /**
+ * @brief      Draws all active blasts to screen
+ */
+void blast_draw_all() {
+    int32 i;
+
+    for (i = 0; i < num_blasts; ++i) {
+        blast_draw(blasts[i]);
+    }
+}
+
+/**
  * @brief      Deletes blast, freeing its memory
  *
  * @param      blast  The blast
@@ -164,6 +185,9 @@ Blast * blast_delete(Blast *blast) {
     return blast;
 }
 
+/**
+ * @brief      Delete all blasts on list
+ */
 void blast_delete_all() {
     int32 i;
 
@@ -175,6 +199,11 @@ void blast_delete_all() {
     num_blasts = 0;
 }
 
+/**
+ * @brief      Move blast
+ *
+ * @param      blast  The blast
+ */
 void blast_move(Blast *blast) {
     float dx;
     float dy;
@@ -206,6 +235,9 @@ void blast_move(Blast *blast) {
     blast->y += dy;
 }
 
+/**
+ * @brief      Move all blasts
+ */
 void blast_move_all() {
     int32 i;
 

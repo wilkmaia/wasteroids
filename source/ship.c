@@ -41,14 +41,9 @@
 =            Local definitions            =
 =========================================*/
 
-static const float alpha1 = 2.4150f;
-static const float size1 = 12.0416f;
-
-static const float alpha3 = 2.1588f;
-static const float size3 = 7.2111f;
-
-static const float alpha4 = 2.8966f;
-static const float size4 = 4.1231f;
+static const float alpha1 = ALLEGRO_PI * 165.0f / 180.0f;
+static const float alpha3 = ALLEGRO_PI * 165.0f / 180.0f;
+static const float alpha4 = ALLEGRO_PI * 175.0f / 180.0f;
 
 static void print_coords(float x1, float y1, float x2, float y2) {
     printf("\nCoords:\n");
@@ -90,6 +85,11 @@ Ship * ship_make_new(float x, float y, float direction, float scale, float speed
     return newShip;
 }
 
+/**
+ * @brief      Creates a new Ship with default values
+ *
+ * @return     Pointer to new Ship
+ */
 Ship * ship_make_new_default() {
     Ship * newShip;
     float x = 100.0f;
@@ -98,7 +98,7 @@ Ship * ship_make_new_default() {
     float scale = 2.0f;
     float speed = 3.0f;
     bool alive = true;
-    ALLEGRO_COLOR color = al_map_rgb(0, 255, 0);
+    ALLEGRO_COLOR color = SHIP_COLOR;
     float thickness = 3.0f;
 
     newShip = ship_make_new(x, y, direction, scale, speed, alive,
@@ -138,6 +138,9 @@ int8 ship_draw(Ship *ship) {
     float dir;
     float scale;
 
+    int32 width;
+    int32 height;
+
     // Shouldn't draw if ship wasn't alive
     if (!ship->alive) {
         return -1;
@@ -148,29 +151,50 @@ int8 ship_draw(Ship *ship) {
     dir = ship->direction;
     scale = ship->scale;
 
+    // If it crosses the border, make it apper on the other side
+    width = al_get_display_width(screen);
+    height = al_get_display_height(screen);
+    if (x_center > width) {
+        x_center = 0;
+        ship->x = 0;
+    }
+    else if (x_center < 0) {
+        x_center = width;
+        ship->x = width;
+    }
+
+    if (y_center > height) {
+        y_center = 0;
+        ship->y = 0;
+    }
+    else if (y_center < 0) {
+        y_center = height;
+        ship->y = height;
+    }
+
     // Get base points
-    x[0] = x_center + scale * 11.0f * (float) cos(dir);
-    y[0] = y_center - scale * 11.0f * (float) sin(dir);
+    x[0] = x_center;
+    y[0] = y_center;
 
-    x[1] = x_center + scale * size1 * (float) cos(dir + alpha1);
-    y[1] = y_center - scale * size1 * (float) sin(dir + alpha1);
+    x[1] = x_center + scale * SHIP_DIMENSION * (float) cos(dir + alpha1);
+    y[1] = y_center - scale * SHIP_DIMENSION * (float) sin(dir + alpha1);
 
-    x[3] = x_center + scale * size3 * (float) cos(dir + alpha3);
-    y[3] = y_center - scale * size3 * (float) sin(dir + alpha3);
+    x[3] = x_center + scale * SHIP_DIMENSION * (float) cos(dir + alpha3) * 2.0f / 3.0f;
+    y[3] = y_center - scale * SHIP_DIMENSION * (float) sin(dir + alpha3) * 2.0f / 3.0f;
 
-    x[4] = x_center + scale * size4 * (float) cos(dir + alpha4);
-    y[4] = y_center - scale * size4 * (float) sin(dir + alpha4);
+    x[4] = x_center + scale * SHIP_DIMENSION * (float) cos(dir + alpha4) * 2.0f / 3.0f;
+    y[4] = y_center - scale * SHIP_DIMENSION * (float) sin(dir + alpha4) * 2.0f / 3.0f;
 
-    x[2] = x_center + scale * size1 * (float) cos(dir - alpha1);
-    y[2] = y_center - scale * size1 * (float) sin(dir - alpha1);
+    x[2] = x_center + scale * SHIP_DIMENSION * (float) cos(dir - alpha1);
+    y[2] = y_center - scale * SHIP_DIMENSION * (float) sin(dir - alpha1);
 
-    x[6] = x_center + scale * size3 * (float) cos(dir - alpha3);
-    y[6] = y_center - scale * size3 * (float) sin(dir - alpha3);
+    x[6] = x_center + scale * SHIP_DIMENSION * (float) cos(dir - alpha3) * 2.0f / 3.0f;
+    y[6] = y_center - scale * SHIP_DIMENSION * (float) sin(dir - alpha3) * 2.0f / 3.0f;
 
-    x[5] = x_center + scale * size4 * (float) cos(dir - alpha4);
-    y[5] = y_center - scale * size4 * (float) sin(dir - alpha4);
+    x[5] = x_center + scale * SHIP_DIMENSION * (float) cos(dir - alpha4) * 2.0f / 3.0f;
+    y[5] = y_center - scale * SHIP_DIMENSION * (float) sin(dir - alpha4) * 2.0f / 3.0f;
 
-    // Draws the four lines
+    // Draws the four line segments
     al_draw_line(x[0], y[0], x[1], y[1], ship->color, ship->thickness);
     al_draw_line(x[0], y[0], x[2], y[2], ship->color, ship->thickness);
     al_draw_line(x[3], y[3], x[4], y[4], ship->color, ship->thickness);
@@ -193,6 +217,11 @@ Ship * ship_delete(Ship *ship) {
     return ship;
 }
 
+/**
+ * @brief      Moves the ship
+ *
+ * @param      ship  The ship
+ */
 void ship_move(Ship *ship) {
     float dx;
     float dy;
@@ -207,15 +236,15 @@ void ship_move(Ship *ship) {
     
     if (pressed_keys[ALLEGRO_KEY_LEFT]) {
         ship->direction += DIRECTION_STEP;
-        if (ship->direction >= 2 * ALLEGRO_PI) {
-            ship->direction = 0.0f + (ship->direction - 2 * ALLEGRO_PI);
+        if (ship->direction >= MAX_ANGLE) {
+            ship->direction = 0.0f + (ship->direction - MAX_ANGLE);
         }
     }
 
     if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
         ship->direction -= DIRECTION_STEP;
         if (ship->direction < 0.0f) {
-            ship->direction = 2 * ALLEGRO_PI  + ship->direction;
+            ship->direction = MAX_ANGLE + ship->direction;
         }
     }
 

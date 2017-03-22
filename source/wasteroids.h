@@ -118,6 +118,11 @@ extern struct ALLEGRO_FONT *font;
 extern struct ALLEGRO_FONT *font_video;
 
 /**
+ * @brief      Max possible angle
+ */
+extern const float MAX_ANGLE;
+
+/**
  * Step for angle change in radians
  */
 #define DIRECTION_STEP 0.05f
@@ -137,6 +142,9 @@ typedef struct {
     float thickness;
 } Ship;
 
+#define SHIP_COLOR al_map_rgb(0, 255, 0)
+
+extern const float SHIP_DIMENSION;
 
 Ship * ship_make_new(float x, float y, float direction, float scale, float speed,
                    bool alive, ALLEGRO_COLOR color, float thickness);
@@ -170,6 +178,7 @@ void hiscore_shutdown();
 #endif // WAS_USING_HISCORE
 
 
+
 /*----------  BLAST  ----------*/
 
 #ifdef WAS_USING_BLAST
@@ -187,20 +196,61 @@ typedef struct {
 /**
  * Max number of live blasts
  */
-#define WAS_MAX_BLASTS 30
+#define BLAST_MAX 30
+#define BLAST_COLOR al_map_rgb(255, 0, 0)
 
-extern Blast *(blasts[WAS_MAX_BLASTS]);
+extern Blast *(blasts[BLAST_MAX]);
 extern int32 num_blasts;
 
 Blast * blast_make_new(float x, float y, float direction, float size, float speed,
                    bool alive, ALLEGRO_COLOR color, float thickness);
 Blast * blast_make_new_default(float x, float y, float direction);
 int8 blast_draw(Blast *blast);
+void blast_draw_all();
 void blast_move(Blast *blast);
+void blast_move_all();
 Blast * blast_delete(Blast *blast);
 void blast_delete_all();
-void blast_move_all();
 #endif // WAS_USING_BLAST
+
+
+
+/*----------  ASTEROID  ----------*/
+
+#ifdef WAS_USING_ASTEROID
+typedef struct {
+    float x;
+    float y;
+    float direction;
+    float scale;
+    float speed;
+    bool alive;
+    ALLEGRO_COLOR color;
+    float thickness;
+} Asteroid;
+
+/**
+ * Max number of live blasts
+ */
+#define ASTEROID_MAX 30
+#define ASTEROID_COLOR al_map_rgb(0, 0, 255)
+
+extern const float ASTEROID_DIMENSION;
+extern Asteroid *(asteroids[ASTEROID_MAX]);
+extern int32 num_asteroids;
+
+Asteroid * asteroid_make_new(float x, float y, float direction, float scale, float speed,
+                             bool alive, ALLEGRO_COLOR color, float thickness);
+Asteroid * asteroid_make_new_default(float x, float y, float direction, float scale);
+int8 asteroid_draw(Asteroid *asteroid);
+void asteroid_draw_all();
+void asteroid_move(Asteroid *asteroid);
+void asteroid_move_all();
+Asteroid * asteroid_delete(Asteroid *asteroid);
+void asteroid_delete_all();
+void asteroid_populate(int32 n);
+#endif // WAS_USING_BLAST
+
 
 /*=====  End of WAsteroids' specifics  ======*/
 

@@ -18,4 +18,5 @@ add_executable(wasteroids.out
     source/hiscore.c
     source/input.c
     source/blast.c
+    source/asteroid.c
 )

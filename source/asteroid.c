@@ -1,0 +1,284 @@
+/*
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2017 Wilk Maia
+ * wilkmaia [at] gmail [dot] com
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ */
+
+/**
+ * Asteroid functions
+ * 
+ * TODO
+ */
+
+#define WAS_USING_ASTEROID
+#define WAS_USING_SHIP
+#include "wasteroids.h"
+
+
+/*=========================================
+=            Local definitions            =
+=========================================*/
+
+static void print_coords(float x1, float y1, float x2, float y2) {
+    printf("\nCoords:\n");
+    printf("(x1, y1) = (%.2f, %.2f)\n", x1, y1);
+    printf("(x2, y2) = (%.2f, %.2f)\n", x2, y2);
+    printf("\n");
+}
+
+/*=====  End of Local definitions  ======*/
+
+
+/**
+ * @brief      Creates a new asteroid
+ *
+ * @param[in]  x          x position
+ * @param[in]  y          y position
+ * @param[in]  direction  The direction
+ * @param[in]  speed      The speed
+ * @param[in]  alive      The alive
+ * @param[in]  color      The color
+ *
+ * @return     Pointer to new asteroid
+ */
+Asteroid * asteroid_make_new(float x, float y, float direction, float scale, float speed,
+                       bool alive, ALLEGRO_COLOR color, float thickness) {
+    Asteroid * newAsteroid;
+    newAsteroid = (Asteroid *) malloc(sizeof(Asteroid));
+
+    // Value checking
+    newAsteroid->x = x;
+    newAsteroid->y = y;
+    newAsteroid->direction = direction;
+    newAsteroid->scale = scale;
+    newAsteroid->speed = speed;
+    newAsteroid->alive = alive;
+    newAsteroid->color = color;
+    newAsteroid->thickness = thickness;
+
+    // Add new asteroid to asteroid list
+    asteroids[num_asteroids] = newAsteroid;
+    ++num_asteroids;
+
+    return newAsteroid;
+}
+
+/**
+ * @brief      Creates a new asteroid with default setup
+ *
+ * @param[in]  x          center x-coordinate
+ * @param[in]  y          center y-coordinate
+ * @param[in]  direction  The direction
+ * @param[in]  scale      The scale
+ *
+ * @return     Pointer to new asteroid
+ */
+Asteroid * asteroid_make_new_default(float x, float y, float direction, float scale) {
+    Asteroid * newAsteroid;
+    float speed = 5.0f - scale;
+    bool alive = true;
+    ALLEGRO_COLOR color = ASTEROID_COLOR;
+    float thickness = 3.0f;
+
+    x += SHIP_DIMENSION * (float) cos(direction);
+    y -= SHIP_DIMENSION * (float) sin(direction);
+
+    newAsteroid = asteroid_make_new(x, y, direction, scale, speed, alive,
+                                    color, thickness);
+
+    return newAsteroid;
+}
+
+/**
+ * @brief      Draws asteroid on screen
+ *
+ * @param      asteroid  The asteroid
+ *
+ * @return     0 for success or anything else for error
+ */
+int8 asteroid_draw(Asteroid *asteroid) {
+    // Asteroid opposite corners
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+
+    float scale;
+    // Shouldn't draw if asteroid wasn't alive
+    if (!asteroid->alive) {
+        return -1;
+    }
+
+    scale = asteroid->scale;
+    // For the sake of simplicity the asteroid will be a square
+    x1 = asteroid->x - scale * ASTEROID_DIMENSION;
+    y1 = asteroid->y - scale * ASTEROID_DIMENSION;
+    x2 = asteroid->x + scale * ASTEROID_DIMENSION;
+    y2 = asteroid->y + scale * ASTEROID_DIMENSION;
+
+    // Draws the asteroid
+    al_draw_filled_rectangle(x1, y1, x2, y2, ASTEROID_COLOR);
+
+    return 0;
+}
+
+/**
+ * @brief      Draws all active asteroids to screen
+ */
+void asteroid_draw_all() {
+    int32 i;
+
+    for (i = 0; i < num_asteroids; ++i) {
+        asteroid_draw(asteroids[i]);
+    }
+}
+
+/**
+ * @brief      Deletes asteroid, freeing its memory
+ *
+ * @param      asteroid  The asteroid
+ *
+ * @return     Pointer to object. Should point to NULL if everything went ok.
+ */
+Asteroid * asteroid_delete(Asteroid *asteroid) {
+    int32 i;
+
+    // TODO
+    // Implement a linked list instead maybe
+    for (i = 0; i < num_asteroids; ++i) {
+        if (asteroids[i] == asteroid) {
+            break; // Found the element
+        }
+    }
+    if (i < num_asteroids) { // Element found
+        int32 j;
+        for (j = i + 1; j < num_asteroids; ++j) {
+            asteroids[j-1] = asteroids[j];
+        }
+        --num_asteroids;
+    }
+
+    free(asteroid);
+    asteroid = NULL;
+
+    return asteroid;
+}
+
+/**
+ * @brief      Delete all asteroids on list
+ */
+void asteroid_delete_all() {
+    int32 i;
+
+    for (i = 0; i < num_asteroids; ++i) {
+        free(asteroids[i]);
+        asteroids[i] = NULL;
+    }
+
+    num_asteroids = 0;
+}
+
+/**
+ * @brief      Move asteroid
+ *
+ * @param      asteroid  The asteroid
+ */
+void asteroid_move(Asteroid *asteroid) {
+    float x_center = asteroid->x;
+    float y_center = asteroid->y;
+    float dx;
+    float dy;
+
+    int32 width;
+    int32 height;
+
+    // No need to waste time here if asteroid isn't alive
+    if (!asteroid->alive) {
+        asteroid_delete(asteroid);
+        return;
+    }
+
+    // If it crosses the border, make it appears on the other side
+    width = al_get_display_width(screen);
+    height = al_get_display_height(screen);
+    if (x_center > width) {
+        x_center = 0;
+        asteroid->x = 0;
+    }
+    else if (x_center < 0) {
+        x_center = width;
+        asteroid->x = width;
+    }
+
+    if (y_center > height) {
+        y_center = 0;
+        asteroid->y = 0;
+    }
+    else if (y_center < 0) {
+        y_center = height;
+        asteroid->y = height;
+    }
+
+    dx = asteroid->speed * cos(asteroid->direction);
+    dy = - asteroid->speed * sin(asteroid->direction);
+
+    asteroid->x += dx;
+    asteroid->y += dy;
+}
+
+/**
+ * @brief      Move all asteroids
+ */
+void asteroid_move_all() {
+    int32 i;
+
+    for (i = 0; i < num_asteroids; ++i) {
+        asteroid_move(asteroids[i]);
+    }
+}
+
+/**
+ * @brief      Populates the asteroid list with _n_ asteroids
+ *
+ * @param[in]  n     Number of asteroids
+ */
+void asteroid_populate(int32 n) {
+    int32 i;
+
+    for (i = 0; i < n; ++i) {
+        float x;
+        float y;
+        float direction;
+        float scale;
+
+        // Randomly populates
+        x = rand() % al_get_display_width(screen);
+        y = rand() % al_get_display_height(screen);
+        direction = MAX_ANGLE * ((rand() % 100) / 100.0f);
+        scale = 1.0f + ((rand() % 11) / 5.0f);
+
+        // Make new asteroid
+        asteroid_make_new_default(x, y, direction, scale);
+    }
+}

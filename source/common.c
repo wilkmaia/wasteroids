@@ -32,15 +32,32 @@
 #define WAS_USING_INPUT
 #define WAS_USING_SHIP
 #define WAS_USING_BLAST
+#define WAS_USING_ASTEROID
 #include "wasteroids.h"
 
-// Project variables definitions
+
+/*==============================================================
+=            Project global variables and constants            =
+==============================================================*/
+
 struct ALLEGRO_DISPLAY *screen;
 struct ALLEGRO_FONT *font;
 struct ALLEGRO_FONT *font_video;
 bool pressed_keys[ALLEGRO_KEY_MAX];
-Blast *(blasts[WAS_MAX_BLASTS]);
+
+Blast *(blasts[BLAST_MAX]);
 int32 num_blasts = 0;
+
+Asteroid *(asteroids[ASTEROID_MAX]);
+int32 num_asteroids = 0;
+
+const float SHIP_DIMENSION = 20.0f;
+const float ASTEROID_DIMENSION = 15.0f;
+
+const float MAX_ANGLE = 2.0f * (float) ALLEGRO_PI;
+
+/*=====  End of Project global variables and constants  ======*/
+
 
 
 void error(char *msg) {
@@ -100,15 +117,15 @@ bool run_game(Ship *ship) {
     input_wait_for_event(&ev);
     bool redraw = false;
 
-    Blast *newBlast;
-
     // Checks for key pressed
     if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (ev.keyboard.keycode) {
+            // Finishes the game
             case ALLEGRO_KEY_ESCAPE:
                 return false;
                 break;
 
+            // Move ship around
             case ALLEGRO_KEY_UP:
             case ALLEGRO_KEY_DOWN:
             case ALLEGRO_KEY_LEFT:
@@ -116,11 +133,11 @@ bool run_game(Ship *ship) {
                 pressed_keys[ev.keyboard.keycode] = true;
                 break;
 
+            // Fires blast
             case ALLEGRO_KEY_SPACE:
-                if (num_blasts >= WAS_MAX_BLASTS)
+                if (num_blasts >= BLAST_MAX)
                     break;
-
-                newBlast = blast_make_new_default(ship->x, ship->y, ship->direction);
+                blast_make_new_default(ship->x, ship->y, ship->direction);
                 break;
 
             default:
@@ -129,6 +146,7 @@ bool run_game(Ship *ship) {
     }
     // Check for key released
     else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
+        // Stop moving ship
         switch (ev.keyboard.keycode) {
             case ALLEGRO_KEY_UP:
             case ALLEGRO_KEY_DOWN:
@@ -143,22 +161,19 @@ bool run_game(Ship *ship) {
         // TODO Run game logic
         ship_move(ship);
         blast_move_all();
+        asteroid_move_all();
         redraw = true;
     }
 
     if (redraw && input_is_queue_empty()) {
-        int32 i;
-
         redraw = false;
 
         // Redraws objects on screen
         al_clear_to_color(al_map_rgb(0, 0, 0));
         
         ship_draw(ship);
-
-        for (i = 0; i < num_blasts; ++i) {
-            blast_draw(blasts[i]);
-        }
+        blast_draw_all();
+        asteroid_draw_all();
 
         al_flip_display();
     }

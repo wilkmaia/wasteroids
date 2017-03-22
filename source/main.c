@@ -33,6 +33,7 @@
 #define WAS_USING_HISCORE
 #define WAS_USING_SHIP
 #define WAS_USING_BLAST
+#define WAS_USING_ASTEROID
 #include "wasteroids.h"
 
  int main(int argc, char *argv[]) {
@@ -68,7 +69,7 @@
     ============================================*/
     for (i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--fullscreen") == 0) {
-            display_flags |= ALLEGRO_FULLSCREEN;
+            display_flags |= ALLEGRO_FULLSCREEN_WINDOW;
         }
         else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             print_usage_message();
@@ -109,14 +110,19 @@
 
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_SAMPLES, 4, ALLEGRO_SUGGEST);
-
     al_set_new_display_flags(display_flags);
 
+    // Attempts to create the display object
     screen = al_create_display(width, height);
     if (!screen) {
         char buf[128] = {};
         sprintf(buf, "Error setting %dx%d display mode", width, height);
         error(buf);
+    }
+
+    // Hide mouse if in fullscreen mode
+    if (display_flags & ALLEGRO_FULLSCREEN_WINDOW) {
+        al_hide_mouse_cursor(screen);
     }
 
 
@@ -132,17 +138,18 @@
     /*====================================
     =            Game objects            =
     ====================================*/
+    // Ship
     Ship *ship = (Ship *)malloc(sizeof(Ship));
     ship = ship_make_new_default();
+
+    // Asteroids
+    asteroid_populate(5);
 
 
     /*=================================
     =            Game loop            =
     =================================*/
-    while (run_game(ship))
-    {
-        
-    }
+    while (run_game(ship));
 
 
     /*============================================
@@ -150,6 +157,7 @@
     ============================================*/
     ship_delete(ship);
     blast_delete_all();
+    asteroid_delete_all();
 
 
     /*=======================================

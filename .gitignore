@@ -37,4 +37,9 @@ CMakeFiles/
 CMakeCache.txt
 Makefile
 *.cmake
-compile_commands.json
+*.json
+*.sublime-project
+*.sublime-workspace
+
+# Valgrind
+vgcore.*

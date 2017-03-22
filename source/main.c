@@ -29,9 +29,120 @@
  * Main project file
  */
 
+#define WAS_USING_INPUT
+#define WAS_USING_HISCORE
 #include "wasteroids.h"
 
  int main(int argc, char *argv[]) {
+    int8 i;
+    int32 display_flags;
+    int32 n;
+    int32 width;
+    int32 height;
+
+    srand(time(NULL));
+
+    /*==========================================
+    =            Initialise Allegro            =
+    ==========================================*/
+    al_set_org_name("Wilk Maia");
+    al_set_app_name("WAsteroids");
+
+    if (!al_init()) {
+        fprintf(stderr, "Could not initialise Allegro.\n");
+        return -1;
+    }
+    al_init_primitives_addon();
+    display_flags = ALLEGRO_GENERATE_EXPOSE_EVENTS;
+    width = 0;
+    height = 0;
+
+
+    /*============================================
+    =            Command-line parsing            =
+    ============================================*/
+    for (i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--fullscreen") == 0) {
+            display_flags |= ALLEGRO_FULLSCREEN;
+        }
+        else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+            print_usage_message();
+            return -1;
+        }
+        else {
+            n = atoi(argv[i]);
+
+            if (!n) {
+                print_usage_message();
+                return -1;
+            }
+
+            if (0 == width) {
+                width = n;
+            }
+            else if (0 == height) {
+                height = n;
+            }
+            else {
+                print_usage_message();
+                return -1;
+            }
+        }
+    }
+
+
+    /*=========================================
+    =            New Display Setup            =
+    =========================================*/
+    // If user didn't input width, height or fullcreen option
+    // Defaults to 800x600
+    if (width == 0 || height == 0
+            || !(display_flags & ALLEGRO_FULLSCREEN)) {
+        width = 800;
+        height = 600;
+    }
+
+    al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_SAMPLES, 4, ALLEGRO_SUGGEST);
+
+    al_set_new_display_flags(display_flags);
+
+    screen = al_create_display(width, height);
+    if (!screen) {
+        fprintf(stderr, "Error setting %dx%d display mode\n", width, height);
+        return -1;
+    }
+
+
+    /*====================================
+    =            Other setups            =
+    ====================================*/
+    al_install_keyboard();
+
+    input_init();
+    hiscore_init();
+
+
+    /*=================================
+    =            Main loop            =
+    =================================*/
+    // while (title_screen()) {
+    //     if (play_game()) {
+    //         show_results();
+    //         score_table();
+    //     }
+    // }
+
+
+    /*===============================
+    =            Cleanup            =
+    ===============================*/
+    hiscore_shutdown();
+    input_shutdown();
+
+    // al_destroy_font(font);
+    // al_destroy_font(font_video);
+
 
     return 0;
  }

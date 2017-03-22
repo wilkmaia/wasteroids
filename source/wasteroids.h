@@ -1,3 +1,4 @@
+#pragma once
 /*
  *
  * MIT License
@@ -25,17 +26,224 @@
  * 
  */
 
+/*=================================================
+=            Standard Library includes            =
+=================================================*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdint.h>
+#include <time.h>
 
-// Function prototypes
+/*=====  End of Standard Library includes  ======*/
+
+
+
+/*===============================
+=            Allegro            =
+===============================*/
+
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
+
+/*=====  End of Allegro  ======*/
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+
+/*=========================================
+=            Default datatypes            =
+=========================================*/
+
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
+
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
+
+#ifndef NULL
+    #define NULL (void *)0
+#endif // NULL
+
+#ifndef NUL
+    #define NUL 0
+#endif // NUL
+
+#ifndef FALSE
+    #define FALSE (0 != 0)
+#endif // FALSE
+
+#ifndef TRUE
+    #define TRUE (0 == 0)
+#endif // TRUE
+
+/*=====  End of Default datatypes  ======*/
+
+
+
+/*=============================================
+=            WAsteroids' specifics            =
+=============================================*/
+
+// Global variables
+extern struct ALLEGRO_DISPLAY *screen;
+extern int32 key[ALLEGRO_KEY_MAX];
+extern struct ALLEGRO_FONT *font;
+extern struct ALLEGRO_FONT *font_video;
+
+
+// Ship specifics
+#ifdef WAS_USING_SHIP
+typedef struct {
+    float x;
+    float y;
+    float direction;
+    float speed;
+    bool alive;
+    ALLEGRO_COLOR color;
+} Ship;
 
 /**
- * @brief      Displays error message and terminates program
+ * @brief      Creates a new Ship
+ *
+ * @param[in]  x          x position
+ * @param[in]  y          y position
+ * @param[in]  direction  The direction
+ * @param[in]  speed      The speed
+ * @param[in]  alive      The alive
+ * @param[in]  color      The color
+ *
+ * @return     Pointer to new Ship
+ */
+Ship * ship_make_new(float x, float y, float direction, float speed,
+                   bool alive, ALLEGRO_COLOR color);
+
+/**
+ * @brief      Draws ship on screen
+ *
+ * @return     0 for success or anything else for error
+ */
+int8 ship_draw();
+
+/**
+ * @brief      Deletes ship, freeing its memory
+ *
+ * @param      ship  The ship
+ *
+ * @return     Pointer to object. Should point to NULL if everything went ok.
+ */
+Ship * ship_delete(Ship *ship);
+#endif // WAS_USING_SHIP
+
+
+// Input specifics
+#ifdef WAS_USING_INPUT
+/**
+ * @brief      Initialise input service
+ */
+void input_init();
+
+/**
+ * @brief      Cleanup for input service
+ */
+void input_shutdown();
+#endif // WAS_USING_INPUT
+
+
+// Hiscore specifics
+#ifdef WAS_USING_HISCORE
+#define NUM_SCORES 8
+#define MAX_NAME_LEN 24
+
+/**
+ * @brief      Initialise hiscore service
+ */
+void hiscore_init();
+
+/**
+ * @brief      Cleanup for hiscore service
+ */
+void hiscore_shutdown();
+#endif // WAS_USING_HISCORE
+/*=====  End of WAsteroids' specifics  ======*/
+
+
+
+/*==================================================
+=            Common function prototypes            =
+==================================================*/
+
+/**
+ * @brief      Displays error message before terminating program
  *
  * @param      msg   Error message
  */
 void error(char *msg);
 
+/**
+ * @brief      Prints usage message
+ */
+void print_usage_message();
+
+/**
+ * @brief      Gets configuration value (number)
+ *
+ * @param[in]  cfg      The configuration file
+ * @param[in]  section  The section
+ * @param[in]  name     The name
+ * @param[in]  def      The definition
+ *
+ * @return     The configuration value (number)
+ */
+int32 get_config_int(const ALLEGRO_CONFIG *cfg, const char *section, 
+                     const char *name, int32 def);
+
+/**
+ * @brief      Gets the configuration value (text)
+ *
+ * @param[in]  cfg      The configuration file
+ * @param[in]  section  The section
+ * @param[in]  name     The name
+ * @param[in]  def      The definition
+ *
+ * @return     The configuration value (text)
+ */
+const char *get_config_string(const ALLEGRO_CONFIG *cfg, const char *section,
+                              const char *name, const char *def);
+
+/**
+ * @brief      Sets the configuration value (number)
+ *
+ * @param      cfg      The configuration
+ * @param[in]  section  The section
+ * @param[in]  name     The name
+ * @param[in]  val      The value
+ */
+void set_config_int(ALLEGRO_CONFIG *cfg, const char *section,
+                    const char *name, int32 val);
+
+/**
+ * @brief      Sets the configuration value (text).
+ *
+ * @param      cfg      The configuration
+ * @param[in]  section  The section
+ * @param[in]  name     The name
+ * @param[in]  val      The value
+ */
+void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
+                              const char *name, const char *val);
+
+/*=====  End of Common function prototypes  ======*/
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus

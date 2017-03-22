@@ -32,6 +32,7 @@
 #define WAS_USING_INPUT
 #define WAS_USING_HISCORE
 #define WAS_USING_SHIP
+#define WAS_USING_BLAST
 #include "wasteroids.h"
 
  int main(int argc, char *argv[]) {
@@ -148,6 +149,7 @@
     =            Game objects cleanup            =
     ============================================*/
     ship_delete(ship);
+    blast_delete_all();
 
 
     /*=======================================

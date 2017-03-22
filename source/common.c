@@ -31,6 +31,7 @@
 
 #define WAS_USING_INPUT
 #define WAS_USING_SHIP
+#define WAS_USING_BLAST
 #include "wasteroids.h"
 
 // Project variables definitions
@@ -38,6 +39,8 @@ struct ALLEGRO_DISPLAY *screen;
 struct ALLEGRO_FONT *font;
 struct ALLEGRO_FONT *font_video;
 bool pressed_keys[ALLEGRO_KEY_MAX];
+Blast *(blasts[WAS_MAX_BLASTS]);
+int32 num_blasts = 0;
 
 
 void error(char *msg) {
@@ -97,6 +100,8 @@ bool run_game(Ship *ship) {
     input_wait_for_event(&ev);
     bool redraw = false;
 
+    Blast *newBlast;
+
     // Checks for key pressed
     if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (ev.keyboard.keycode) {
@@ -109,6 +114,13 @@ bool run_game(Ship *ship) {
             case ALLEGRO_KEY_LEFT:
             case ALLEGRO_KEY_RIGHT:
                 pressed_keys[ev.keyboard.keycode] = true;
+                break;
+
+            case ALLEGRO_KEY_SPACE:
+                if (num_blasts >= WAS_MAX_BLASTS)
+                    break;
+
+                newBlast = blast_make_new_default(ship->x, ship->y, ship->direction);
                 break;
 
             default:
@@ -130,16 +142,23 @@ bool run_game(Ship *ship) {
     else if (ev.type == ALLEGRO_EVENT_TIMER) {
         // TODO Run game logic
         ship_move(ship);
+        blast_move_all();
         redraw = true;
     }
 
     if (redraw && input_is_queue_empty()) {
+        int32 i;
+
         redraw = false;
 
         // Redraws objects on screen
         al_clear_to_color(al_map_rgb(0, 0, 0));
         
         ship_draw(ship);
+
+        for (i = 0; i < num_blasts; ++i) {
+            blast_draw(blasts[i]);
+        }
 
         al_flip_display();
     }

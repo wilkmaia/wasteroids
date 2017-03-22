@@ -72,7 +72,7 @@ static void print_coords(float x1, float y1, float x2, float y2) {
  *
  * @return     Pointer to new Ship
  */
-Ship * ship_make_new(float x, float y, float direction, float speed,
+Ship * ship_make_new(float x, float y, float direction, float scale, float speed,
                    bool alive, ALLEGRO_COLOR color, float thickness) {
     Ship * newShip;
     newShip = (Ship *) malloc(sizeof(Ship));
@@ -81,6 +81,7 @@ Ship * ship_make_new(float x, float y, float direction, float speed,
     newShip->x = x;
     newShip->y = y;
     newShip->direction = direction;
+    newShip->scale = scale;
     newShip->speed = speed;
     newShip->alive = alive;
     newShip->color = color;
@@ -94,12 +95,13 @@ Ship * ship_make_new_default() {
     float x = 100.0f;
     float y = 100.0f;
     float direction = 0.0f;
+    float scale = 2.0f;
     float speed = 3.0f;
     bool alive = true;
     ALLEGRO_COLOR color = al_map_rgb(0, 255, 0);
     float thickness = 3.0f;
 
-    newShip = ship_make_new(x, y, direction, speed, alive,
+    newShip = ship_make_new(x, y, direction, scale, speed, alive,
                             color, thickness);
 
     return newShip;
@@ -113,10 +115,8 @@ Ship * ship_make_new_default() {
  * @return     0 for success or anything else for error
  */
 int8 ship_draw(Ship *ship) {
-    // 7 base points for ship drawing
-    float x[7];
-    float y[7];
-    /*
+    /* 7 base points for ship drawing
+     *
      *    POINTS LOCATION
      *    C stands for Center Point
      *    
@@ -129,48 +129,51 @@ int8 ship_draw(Ship *ship) {
      *    [1]         [2]
      *
      */
+    float x[7];
+    float y[7];
 
     // Points are relative to center and ship's direction
     float x_center;
     float y_center;
     float dir;
+    float scale;
+
+    // Shouldn't draw if ship wasn't alive
+    if (!ship->alive) {
+        return -1;
+    }
 
     x_center = ship->x;
     y_center = ship->y;
     dir = ship->direction;
+    scale = ship->scale;
 
     // Get base points
-    x[0] = x_center + 11.0f * cos(dir);
-    y[0] = y_center - 11.0f * sin(dir);
+    x[0] = x_center + scale * 11.0f * (float) cos(dir);
+    y[0] = y_center - scale * 11.0f * (float) sin(dir);
 
-    x[1] = x_center + size1 * (float) cos(dir + alpha1);
-    y[1] = y_center - size1 * (float) sin(dir + alpha1);
+    x[1] = x_center + scale * size1 * (float) cos(dir + alpha1);
+    y[1] = y_center - scale * size1 * (float) sin(dir + alpha1);
 
-    x[3] = x_center + size3 * (float) cos(dir + alpha3);
-    y[3] = y_center - size3 * (float) sin(dir + alpha3);
+    x[3] = x_center + scale * size3 * (float) cos(dir + alpha3);
+    y[3] = y_center - scale * size3 * (float) sin(dir + alpha3);
 
-    x[4] = x_center + size4 * (float) cos(dir + alpha4);
-    y[4] = y_center - size4 * (float) sin(dir + alpha4);
+    x[4] = x_center + scale * size4 * (float) cos(dir + alpha4);
+    y[4] = y_center - scale * size4 * (float) sin(dir + alpha4);
 
-    x[2] = x_center + size1 * (float) cos(dir - alpha1);
-    y[2] = y_center - size1 * (float) sin(dir - alpha1);
+    x[2] = x_center + scale * size1 * (float) cos(dir - alpha1);
+    y[2] = y_center - scale * size1 * (float) sin(dir - alpha1);
 
-    x[6] = x_center + size3 * (float) cos(dir - alpha3);
-    y[6] = y_center - size3 * (float) sin(dir - alpha3);
+    x[6] = x_center + scale * size3 * (float) cos(dir - alpha3);
+    y[6] = y_center - scale * size3 * (float) sin(dir - alpha3);
 
-    x[5] = x_center + size4 * (float) cos(dir - alpha4);
-    y[5] = y_center - size4 * (float) sin(dir - alpha4);
+    x[5] = x_center + scale * size4 * (float) cos(dir - alpha4);
+    y[5] = y_center - scale * size4 * (float) sin(dir - alpha4);
 
-    // Draws first line
+    // Draws the four lines
     al_draw_line(x[0], y[0], x[1], y[1], ship->color, ship->thickness);
-
-    // Draws second line
     al_draw_line(x[0], y[0], x[2], y[2], ship->color, ship->thickness);
-
-    // Draws third line
     al_draw_line(x[3], y[3], x[4], y[4], ship->color, ship->thickness);
-
-    // Draws fourth line
     al_draw_line(x[5], y[5], x[6], y[6], ship->color, ship->thickness);
 
     return 0;

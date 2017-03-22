@@ -123,12 +123,14 @@ extern struct ALLEGRO_FONT *font_video;
 #define DIRECTION_STEP 0.05f
 
 
-// Ship specifics
+/*----------  SHIP  ----------*/
+
 #ifdef WAS_USING_SHIP
 typedef struct {
     float x;
     float y;
     float direction;
+    float scale;
     float speed;
     bool alive;
     ALLEGRO_COLOR color;
@@ -136,7 +138,7 @@ typedef struct {
 } Ship;
 
 
-Ship * ship_make_new(float x, float y, float direction, float speed,
+Ship * ship_make_new(float x, float y, float direction, float scale, float speed,
                    bool alive, ALLEGRO_COLOR color, float thickness);
 Ship * ship_make_new_default();
 int8 ship_draw(Ship *ship);
@@ -145,7 +147,8 @@ void ship_move(Ship *ship);
 #endif // WAS_USING_SHIP
 
 
-// Input specifics
+/*----------  INPUT  ----------*/
+
 #ifdef WAS_USING_INPUT
 
 void input_init();
@@ -155,7 +158,9 @@ bool input_is_queue_empty();
 #endif // WAS_USING_INPUT
 
 
-// Hiscore specifics
+
+/*----------  HISCORE  ----------*/
+
 #ifdef WAS_USING_HISCORE
 #define NUM_SCORES 8
 #define MAX_NAME_LEN 24
@@ -163,6 +168,40 @@ bool input_is_queue_empty();
 void hiscore_init();
 void hiscore_shutdown();
 #endif // WAS_USING_HISCORE
+
+
+/*----------  BLAST  ----------*/
+
+#ifdef WAS_USING_BLAST
+typedef struct {
+    float x;
+    float y;
+    float direction;
+    float size;
+    float speed;
+    bool alive;
+    ALLEGRO_COLOR color;
+    float thickness;
+} Blast;
+
+/**
+ * Max number of live blasts
+ */
+#define WAS_MAX_BLASTS 30
+
+extern Blast *(blasts[WAS_MAX_BLASTS]);
+extern int32 num_blasts;
+
+Blast * blast_make_new(float x, float y, float direction, float size, float speed,
+                   bool alive, ALLEGRO_COLOR color, float thickness);
+Blast * blast_make_new_default(float x, float y, float direction);
+int8 blast_draw(Blast *blast);
+void blast_move(Blast *blast);
+Blast * blast_delete(Blast *blast);
+void blast_delete_all();
+void blast_move_all();
+#endif // WAS_USING_BLAST
+
 /*=====  End of WAsteroids' specifics  ======*/
 
 

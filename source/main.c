@@ -30,6 +30,10 @@
  * 
  * TODO
  * Improve it using threads
+ * Handle ship-asteroid collision
+ * Handle points
+ * Handle scoreboard
+ * Display points on screen
  */
 
 #define WAS_USING_INPUT
@@ -142,8 +146,7 @@
     =            Game objects            =
     ====================================*/
     // Ship
-    Ship *ship = (Ship *)malloc(sizeof(Ship));
-    ship = ship_make_new_default();
+    ship_init();
 
     // Asteroids
     asteroid_populate(5);
@@ -152,7 +155,7 @@
     /*=================================
     =            Game loop            =
     =================================*/
-    while (run_game(ship));
+    while (run_game());
 
 
     /*============================================

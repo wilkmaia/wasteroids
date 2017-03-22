@@ -55,6 +55,10 @@ static void print_coords(float x1, float y1, float x2, float y2) {
 /*=====  End of Local definitions  ======*/
 
 
+void ship_init() {
+    ship = ship_make_new_default();
+}
+
 /**
  * @brief      Creates a new Ship
  *
@@ -92,9 +96,9 @@ Ship * ship_make_new(float x, float y, float direction, float scale, float speed
  */
 Ship * ship_make_new_default() {
     Ship * newShip;
-    float x = 100.0f;
-    float y = 100.0f;
-    float direction = 0.0f;
+    float x = al_get_display_width(screen) / 2.0f;
+    float y = al_get_display_height(screen) / 2.0f;
+    float direction = ALLEGRO_PI / 2.0f;
     float scale = 2.0f;
     float speed = 3.0f;
     bool alive = true;
@@ -123,7 +127,7 @@ int8 ship_draw(Ship *ship) {
      *          [0]
      *    
      *    
-     *           C
+     *           
      *     [3][4] [5][6]
      *     
      *    [1]         [2]
@@ -132,7 +136,23 @@ int8 ship_draw(Ship *ship) {
     float x[7];
     float y[7];
 
-    // Points are relative to center and ship's direction
+    // Shouldn't draw if ship wasn't alive
+    if (!ship->alive) {
+        return -1;
+    }
+
+    ship_get_base_points(ship, x, y);
+
+    // Draws the four line segments
+    al_draw_line(x[0], y[0], x[1], y[1], ship->color, ship->thickness);
+    al_draw_line(x[0], y[0], x[2], y[2], ship->color, ship->thickness);
+    al_draw_line(x[3], y[3], x[4], y[4], ship->color, ship->thickness);
+    al_draw_line(x[5], y[5], x[6], y[6], ship->color, ship->thickness);
+
+    return 0;
+}
+
+void ship_get_base_points(Ship *ship, float *x, float *y) {
     float x_center;
     float y_center;
     float dir;
@@ -141,11 +161,7 @@ int8 ship_draw(Ship *ship) {
     int32 width;
     int32 height;
 
-    // Shouldn't draw if ship wasn't alive
-    if (!ship->alive) {
-        return -1;
-    }
-
+    // Values of interest
     x_center = ship->x;
     y_center = ship->y;
     dir = ship->direction;
@@ -193,14 +209,6 @@ int8 ship_draw(Ship *ship) {
 
     x[5] = x_center + scale * SHIP_DIMENSION * (float) cos(dir - alpha4) * 2.0f / 3.0f;
     y[5] = y_center - scale * SHIP_DIMENSION * (float) sin(dir - alpha4) * 2.0f / 3.0f;
-
-    // Draws the four line segments
-    al_draw_line(x[0], y[0], x[1], y[1], ship->color, ship->thickness);
-    al_draw_line(x[0], y[0], x[2], y[2], ship->color, ship->thickness);
-    al_draw_line(x[3], y[3], x[4], y[4], ship->color, ship->thickness);
-    al_draw_line(x[5], y[5], x[6], y[6], ship->color, ship->thickness);
-
-    return 0;
 }
 
 /**

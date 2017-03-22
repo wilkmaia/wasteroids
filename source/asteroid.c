@@ -33,6 +33,7 @@
 
 #define WAS_USING_ASTEROID
 #define WAS_USING_BLAST
+#define WAS_USING_SHIP
 #include "wasteroids.h"
 
 
@@ -317,17 +318,21 @@ bool asteroid_check_collision_on_blast(Asteroid *asteroid, Blast *blast) {
     blast_get_end_point(blast, &x_blast, &y_blast);
     asteroid_get_corners(asteroid, &x1, &y1, &x2, &y2);
 
-    // Checks for collision
-    // Could be way better
-    if (x_blast >= x1 && y_blast >= y1
-            && x_blast <= x2 && y_blast <= y2) {
+    // Checks for collision on both points of the blast (start and end points)
+    if (common_check_collision(x_blast, y_blast, x1, y1, x2, y2)
+            || common_check_collision(blast->x, blast->y, x1, y1, x2, y2)) {
         return true;
     }
 
     return false;
 }
 
-void asteroid_collided(Asteroid *asteroid) {
+/**
+ * @brief      Handles collision on asteroid
+ *
+ * @param      asteroid  The asteroid
+ */
+void asteroid_was_hit(Asteroid *asteroid) {
     float direction;
     float scale;
     float x;
@@ -358,6 +363,49 @@ void asteroid_collided(Asteroid *asteroid) {
     asteroid_delete(asteroid);
 }
 
+/**
+ * @brief      Calculates the speed of an asteroid
+ *
+ * @param      asteroid  The asteroid
+ *
+ * @return     Speed value
+ */
 float asteroid_calc_speed(Asteroid *asteroid) {
     return 5.0f - asteroid->scale;
+}
+
+/**
+ * @brief      Checks for collision between the asteroid and the ship
+ *
+ * @param      asteroid  The asteroid
+ * @param      ship      The ship
+ *
+ * @return     true for collision; false otherwise
+ */
+bool asteroid_check_collision_on_ship(Asteroid *asteroid, Ship *ship) {
+    // Ship's base points
+    float x[7];
+    float y[7];
+
+    // Asteroid's corners
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+
+    // Auxiliar
+    int32 i;
+
+    // Get points
+    ship_get_base_points(ship, x, y);
+    asteroid_get_corners(asteroid, &x1, &y1, &x2, &y2);
+
+    // Check for collision for each base point
+    for (i = 0; i < 7; ++i) {
+        if (common_check_collision(x[i], y[i], x1, y1, x2, y2)) {
+            return true;
+        }
+    }    
+
+    return false;
 }

@@ -145,11 +145,14 @@ typedef struct {
 #define SHIP_COLOR al_map_rgb(0, 255, 0)
 
 extern const float SHIP_DIMENSION;
+extern Ship *ship;
 
+void ship_init();
 Ship * ship_make_new(float x, float y, float direction, float scale, float speed,
-                   bool alive, ALLEGRO_COLOR color, float thickness);
+                     bool alive, ALLEGRO_COLOR color, float thickness);
 Ship * ship_make_new_default();
 int8 ship_draw(Ship *ship);
+void ship_get_base_points(Ship *ship, float *x, float *y);
 Ship * ship_delete(Ship *ship);
 void ship_move(Ship *ship);
 #endif // WAS_USING_SHIP
@@ -203,7 +206,7 @@ extern Blast *(blasts[BLAST_MAX]);
 extern int32 num_blasts;
 
 Blast * blast_make_new(float x, float y, float direction, float size, float speed,
-                   bool alive, ALLEGRO_COLOR color, float thickness);
+                       bool alive, ALLEGRO_COLOR color, float thickness);
 Blast * blast_make_new_default(float x, float y, float direction);
 int8 blast_draw(Blast *blast);
 void blast_draw_all();
@@ -245,6 +248,7 @@ Asteroid * asteroid_make_new(float x, float y, float direction, float scale, flo
 Asteroid * asteroid_make_new_default(float x, float y, float direction, float scale);
 int8 asteroid_draw(Asteroid *asteroid);
 void asteroid_draw_all();
+float asteroid_calc_speed(Asteroid *asteroid);
 void asteroid_move(Asteroid *asteroid);
 void asteroid_move_all();
 Asteroid * asteroid_delete(Asteroid *asteroid);
@@ -252,8 +256,8 @@ void asteroid_delete_all();
 void asteroid_populate(int32 n);
 bool asteroid_check_collision_on_blast(Asteroid *asteroid, Blast *blast);
 void asteroid_get_corners(Asteroid *asteroid, float *x1, float *y1, float *x2, float *y2);
-void asteroid_collided(Asteroid *asteroid);
-float asteroid_calc_speed(Asteroid *asteroid);
+void asteroid_was_hit(Asteroid *asteroid);
+bool asteroid_check_collision_on_ship(Asteroid *asteroid, Ship *ship);
 #endif // WAS_USING_BLAST
 
 
@@ -332,11 +336,30 @@ void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
  */
 bool run_game();
 
+/**
+ * @brief      Checks if point (x, y) is inside the rectangle defined by the corner points
+ *
+ * @param[in]  x          x-coord
+ * @param[in]  y          y-coord
+ * @param[in]  corner_x1  Top left x-coord
+ * @param[in]  corner_y1  Top left y-coord
+ * @param[in]  corner_x2  Bottom right x-coord
+ * @param[in]  corner_y2  Bottom right y-coord
+ *
+ * @return     true if the point is inside the rectagle; false otherwise
+ */
+bool common_check_collision(float x, float y, float corner_x1, float corner_y1,
+                            float corner_x2, float corner_y2);
 
 /**
  * @brief      Checks for collision between blasts and asteroids
  */
 void check_blasts_on_asteroids();
+
+/**
+ * @brief      Checks for collision betweein ship and asteroids
+ */
+void check_ship_on_asteroids();
 
 /*=====  End of Common function prototypes  ======*/
 

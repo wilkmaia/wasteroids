@@ -45,6 +45,8 @@ struct ALLEGRO_FONT *font;
 struct ALLEGRO_FONT *font_video;
 bool pressed_keys[ALLEGRO_KEY_MAX];
 
+Ship *ship;
+
 Blast *(blasts[BLAST_MAX]);
 int32 num_blasts = 0;
 
@@ -112,7 +114,7 @@ void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
     al_set_config_value(cfg, section, name, val);
 }
 
-bool run_game(Ship *ship) {
+bool run_game() {
     ALLEGRO_EVENT ev;
     input_wait_for_event(&ev);
     bool redraw = false;
@@ -166,6 +168,9 @@ bool run_game(Ship *ship) {
 
         // Check for collision
         check_blasts_on_asteroids();
+        check_ship_on_asteroids(ship);
+
+        // Sets flag for screen redrawing
         redraw = true;
     }
 
@@ -185,6 +190,16 @@ bool run_game(Ship *ship) {
     return true;
 }
 
+bool common_check_collision(float x, float y, float corner_x1, float corner_y1,
+                            float corner_x2, float corner_y2) {
+    if (x >= corner_x1 && y >= corner_y1
+            && x <= corner_x2 && y <= corner_y2) {
+        return true;
+    }
+
+    return false;
+}
+
 void check_blasts_on_asteroids() {
     int32 i;
 
@@ -196,11 +211,22 @@ void check_blasts_on_asteroids() {
             // If they collide
             if (asteroid_check_collision_on_blast(asteroids[j], blasts[i])) {
                 // Handle the asteroid collision
-                asteroid_collided(asteroids[j]);
+                asteroid_was_hit(asteroids[j]);
 
                 // Deletes blast
                 blast_delete(blasts[i]);
             }
+        }
+    }
+}
+
+void check_ship_on_asteroids() {
+    int32 i;
+
+    // For each asteroid
+    for (i = 0; i < num_asteroids; ++i) {
+        if (asteroid_check_collision_on_ship(asteroids[i], ship)) {
+            // What to do when they collide?
         }
     }
 }

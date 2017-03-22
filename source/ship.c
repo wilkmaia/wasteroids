@@ -27,10 +27,22 @@
 
 /**
  * Spaceship functions
+ * 
+ * TODO
+ * Make a "drawable" class for drawable objects (ship, blasts, asteroids)
+ * to inherit.
  */
 
 #define WAS_USING_SHIP
 #include "wasteroids.h"
+
+
+static void print_coords(float x1, float y1, float x2, float y2) {
+    printf("\nCoords:\n");
+    printf("(x1, y1) = (%.2f, %.2f)\n", x1, y1);
+    printf("(x2, y2) = (%.2f, %.2f)\n", x2, y2);
+    printf("\n");
+}
 
 
 /**
@@ -46,7 +58,7 @@
  * @return     Pointer to new Ship
  */
 Ship * ship_make_new(float x, float y, float direction, float speed,
-                   bool alive, ALLEGRO_COLOR color) {
+                   bool alive, ALLEGRO_COLOR color, float thickness) {
     Ship * newShip;
     newShip = (Ship *) malloc(sizeof(Ship));
 
@@ -55,6 +67,17 @@ Ship * ship_make_new(float x, float y, float direction, float speed,
     newShip->y = y;
     newShip->direction = direction;
     newShip->speed = speed;
+    newShip->alive = alive;
+    newShip->color = color;
+    newShip->thickness = thickness;
+
+    return newShip;
+}
+
+Ship * ship_make_new_default() {
+    Ship * newShip;
+    newShip = ship_make_new(100, 100, 0, 1, true,
+                            al_map_rgb(255, 255, 255), 3.0f);
 
     return newShip;
 }
@@ -67,6 +90,39 @@ Ship * ship_make_new(float x, float y, float direction, float speed,
  * @return     0 for success or anything else for error
  */
 int8 ship_draw(Ship *ship) {
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+
+    // Draws first line
+    x1 = ship->x - 8.0f;
+    y1 = ship->y + 9.0f;
+    x2 = ship->x;
+    y2 = ship->y - 11.0f;
+    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+
+    // Draws second line
+    x1 = ship->x + 8.0f;
+    y1 = ship->y + 9.0f;
+    x2 = ship->x;
+    y2 = ship->y - 11.0f;
+    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+
+    // Draws third line
+    x1 = ship->x - 6.0f;
+    y1 = ship->y + 4.0f;
+    x2 = ship->x - 1.0f;
+    y2 = ship->y + 4.0f;
+    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+
+    // Draws fourth line
+    x1 = ship->x + 6.0f;
+    y1 = ship->y + 4.0f;
+    x2 = ship->x + 1.0f;
+    y2 = ship->y + 4.0f;
+    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+
     return 0;
 }
 

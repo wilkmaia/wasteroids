@@ -104,7 +104,7 @@ extern struct ALLEGRO_DISPLAY *screen;
 /**
  * @brief       key map
  */
-extern int32 key[ALLEGRO_KEY_MAX];
+extern bool pressed_keys[ALLEGRO_KEY_MAX];
 
 /**
  * @brief      font struct
@@ -126,11 +126,13 @@ typedef struct {
     float speed;
     bool alive;
     ALLEGRO_COLOR color;
+    float thickness;
 } Ship;
 
 
 Ship * ship_make_new(float x, float y, float direction, float speed,
-                   bool alive, ALLEGRO_COLOR color);
+                   bool alive, ALLEGRO_COLOR color, float thickness);
+Ship * ship_make_new_default();
 int8 ship_draw(Ship *ship);
 Ship * ship_delete(Ship *ship);
 #endif // WAS_USING_SHIP
@@ -141,6 +143,8 @@ Ship * ship_delete(Ship *ship);
 
 void input_init();
 void input_shutdown();
+void input_wait_for_event(ALLEGRO_EVENT *ev);
+bool input_is_queue_empty();
 #endif // WAS_USING_INPUT
 
 
@@ -219,6 +223,8 @@ void set_config_int(ALLEGRO_CONFIG *cfg, const char *section,
  */
 void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
                               const char *name, const char *val);
+
+bool run_game();
 
 /*=====  End of Common function prototypes  ======*/
 

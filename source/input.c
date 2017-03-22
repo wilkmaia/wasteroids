@@ -37,7 +37,8 @@
 static int32 keybuf_len = 0;
 static ALLEGRO_MUTEX *keybuf_mutex;
 static ALLEGRO_EVENT_QUEUE *input_queue;
-
+static ALLEGRO_TIMER *timer;
+static float FPS = 60.0f;
 
 /**
  * @brief      Initialise input service
@@ -45,11 +46,18 @@ static ALLEGRO_EVENT_QUEUE *input_queue;
 void input_init() {
     keybuf_len = 0;
     keybuf_mutex = al_create_mutex();
+    
+    timer = al_create_timer(1.0 / FPS);
+    if (!timer) {
+        error("Failed to create timer");
+    }
+    al_start_timer(timer);
 
     // Registers input queue
     input_queue = al_create_event_queue();
     al_register_event_source(input_queue, al_get_keyboard_event_source());
     al_register_event_source(input_queue, al_get_display_event_source(screen));
+    al_register_event_source(input_queue, al_get_timer_event_source(timer));
 }
 
 /**
@@ -62,4 +70,25 @@ void input_shutdown() {
 
     al_destroy_event_queue(input_queue);
     input_queue = NULL;
+
+    al_destroy_timer(timer);
+    timer = NULL;
+}
+
+/**
+ * @brief      Waits for an event and registers it in *ev
+ *
+ * @param      ev    pointer to ALLEGRO_EVENT
+ */
+void input_wait_for_event(ALLEGRO_EVENT *ev) {
+    al_wait_for_event(input_queue, ev);
+}
+
+/**
+ * @brief      Checks if event queue is empty
+ *
+ * @return     true for empty queue; false otherwise
+ */
+bool input_is_queue_empty() {
+    return al_is_event_queue_empty(input_queue);
 }

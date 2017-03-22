@@ -31,6 +31,7 @@
 
 #define WAS_USING_INPUT
 #define WAS_USING_HISCORE
+#define WAS_USING_SHIP
 #include "wasteroids.h"
 
  int main(int argc, char *argv[]) {
@@ -49,10 +50,13 @@
     al_set_app_name("WAsteroids");
 
     if (!al_init()) {
-        fprintf(stderr, "Could not initialise Allegro.\n");
-        return -1;
+        error("Couldn't initialise Allegro");
     }
-    al_init_primitives_addon();
+    
+    if (!al_init_primitives_addon()) {
+        error("Couldn't initialise Allegro Primitives Addon");
+    }
+
     display_flags = ALLEGRO_GENERATE_EXPOSE_EVENTS;
     width = 0;
     height = 0;
@@ -109,8 +113,9 @@
 
     screen = al_create_display(width, height);
     if (!screen) {
-        fprintf(stderr, "Error setting %dx%d display mode\n", width, height);
-        return -1;
+        char buf[128] = {};
+        sprintf(buf, "Error setting %dx%d display mode", width, height);
+        error(buf);
     }
 
 
@@ -123,15 +128,24 @@
     hiscore_init();
 
 
+    /*====================================
+    =            Game objects            =
+    ====================================*/
+    Ship *ship = (Ship *)malloc(sizeof(Ship));
+    ship = ship_make_new_default();
+
+
     /*=================================
-    =            Main loop            =
+    =            Game loop            =
     =================================*/
-    // while (title_screen()) {
-    //     if (play_game()) {
-    //         show_results();
-    //         score_table();
-    //     }
-    // }
+    while (run_game())
+    {
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+        
+        ship_draw(ship);
+
+        al_flip_display();
+    }
 
 
     /*===============================

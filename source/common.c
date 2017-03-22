@@ -29,12 +29,14 @@
  * Common functions
  */
 
+#define WAS_USING_INPUT
 #include "wasteroids.h"
 
 // Global variables definitions
 struct ALLEGRO_DISPLAY *screen;
 struct ALLEGRO_FONT *font;
 struct ALLEGRO_FONT *font_video;
+bool pressed_keys[ALLEGRO_KEY_MAX];
 
 
 void error(char *msg) {
@@ -87,5 +89,29 @@ void set_config_int(ALLEGRO_CONFIG *cfg, const char *section,
 void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
                               const char *name, const char *val) {
     al_set_config_value(cfg, section, name, val);
+}
+
+bool run_game() {
+    ALLEGRO_EVENT ev;
+    input_wait_for_event(&ev);
+    bool redraw = false;
+
+    if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+        switch (ev.keyboard.keycode) {
+            case ALLEGRO_KEY_ESCAPE:
+                return false;
+                break;
+        }
+    }
+    else if (ev.type == ALLEGRO_EVENT_TIMER) {
+        // TODO Run game logic
+        redraw = true;
+    }
+
+    if (redraw && input_is_queue_empty()) {
+        redraw = false;
+    }
+
+    return true;
 }
 

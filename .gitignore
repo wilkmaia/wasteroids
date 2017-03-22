@@ -43,3 +43,7 @@ Makefile
 
 # Valgrind
 vgcore.*
+
+# DOxyGen
+source/html/
+source/latex/

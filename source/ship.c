@@ -32,6 +32,19 @@
 #define WAS_USING_SHIP
 #include "wasteroids.h"
 
+
+/**
+ * @brief      Creates a new Ship
+ *
+ * @param[in]  x          x position
+ * @param[in]  y          y position
+ * @param[in]  direction  The direction
+ * @param[in]  speed      The speed
+ * @param[in]  alive      The alive
+ * @param[in]  color      The color
+ *
+ * @return     Pointer to new Ship
+ */
 Ship * ship_make_new(float x, float y, float direction, float speed,
                    bool alive, ALLEGRO_COLOR color) {
     Ship * newShip;
@@ -46,3 +59,25 @@ Ship * ship_make_new(float x, float y, float direction, float speed,
     return newShip;
 }
 
+/**
+ * @brief      Draws ship on screen
+ *
+ * @param      ship  The ship
+ *
+ * @return     0 for success or anything else for error
+ */
+int8 ship_draw(Ship *ship) {
+    return 0;
+}
+
+/**
+ * @brief      Deletes ship, freeing its memory
+ *
+ * @param      ship  The ship
+ *
+ * @return     Pointer to object. Should point to NULL if everything went ok.
+ */
+Ship * ship_delete(Ship *ship) {
+
+    return NULL;
+}

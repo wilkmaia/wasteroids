@@ -40,6 +40,9 @@ static int scores[NUM_SCORES] = {
 static char names[NUM_SCORES][MAX_NAME_LEN+1];
 
 
+/**
+ * @brief      Initialise hiscore service
+ */
 void hiscore_init() {
     ALLEGRO_PATH *path;
     ALLEGRO_CONFIG *cfg;
@@ -74,6 +77,9 @@ void hiscore_init() {
     al_destroy_path(path);
 }
 
+/**
+ * @brief      Cleanup for hiscore service
+ */
 void hiscore_shutdown() {
     ALLEGRO_PATH *path;
     ALLEGRO_CONFIG *cfg;

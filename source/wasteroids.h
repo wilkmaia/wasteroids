@@ -95,9 +95,25 @@ typedef uint64_t uint64;
 =============================================*/
 
 // Global variables
+
+/**
+ * @brief      screen handler
+ */
 extern struct ALLEGRO_DISPLAY *screen;
+
+/**
+ * @brief       key map
+ */
 extern int32 key[ALLEGRO_KEY_MAX];
+
+/**
+ * @brief      font struct
+ */
 extern struct ALLEGRO_FONT *font;
+
+/**
+ * @brief      video font struct
+ */
 extern struct ALLEGRO_FONT *font_video;
 
 
@@ -112,49 +128,18 @@ typedef struct {
     ALLEGRO_COLOR color;
 } Ship;
 
-/**
- * @brief      Creates a new Ship
- *
- * @param[in]  x          x position
- * @param[in]  y          y position
- * @param[in]  direction  The direction
- * @param[in]  speed      The speed
- * @param[in]  alive      The alive
- * @param[in]  color      The color
- *
- * @return     Pointer to new Ship
- */
+
 Ship * ship_make_new(float x, float y, float direction, float speed,
                    bool alive, ALLEGRO_COLOR color);
-
-/**
- * @brief      Draws ship on screen
- *
- * @return     0 for success or anything else for error
- */
-int8 ship_draw();
-
-/**
- * @brief      Deletes ship, freeing its memory
- *
- * @param      ship  The ship
- *
- * @return     Pointer to object. Should point to NULL if everything went ok.
- */
+int8 ship_draw(Ship *ship);
 Ship * ship_delete(Ship *ship);
 #endif // WAS_USING_SHIP
 
 
 // Input specifics
 #ifdef WAS_USING_INPUT
-/**
- * @brief      Initialise input service
- */
-void input_init();
 
-/**
- * @brief      Cleanup for input service
- */
+void input_init();
 void input_shutdown();
 #endif // WAS_USING_INPUT
 
@@ -164,14 +149,7 @@ void input_shutdown();
 #define NUM_SCORES 8
 #define MAX_NAME_LEN 24
 
-/**
- * @brief      Initialise hiscore service
- */
 void hiscore_init();
-
-/**
- * @brief      Cleanup for hiscore service
- */
 void hiscore_shutdown();
 #endif // WAS_USING_HISCORE
 /*=====  End of WAsteroids' specifics  ======*/

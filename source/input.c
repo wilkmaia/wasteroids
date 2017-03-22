@@ -39,6 +39,9 @@ static ALLEGRO_MUTEX *keybuf_mutex;
 static ALLEGRO_EVENT_QUEUE *input_queue;
 
 
+/**
+ * @brief      Initialise input service
+ */
 void input_init() {
     keybuf_len = 0;
     keybuf_mutex = al_create_mutex();
@@ -49,6 +52,9 @@ void input_init() {
     al_register_event_source(input_queue, al_get_display_event_source(screen));
 }
 
+/**
+ * @brief      Cleanup for input service
+ */
 void input_shutdown() {
     // Cleans input queue
     al_destroy_mutex(keybuf_mutex);

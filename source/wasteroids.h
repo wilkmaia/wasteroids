@@ -211,6 +211,7 @@ void blast_move(Blast *blast);
 void blast_move_all();
 Blast * blast_delete(Blast *blast);
 void blast_delete_all();
+void blast_get_end_point(Blast *blast, float *x, float *y);
 #endif // WAS_USING_BLAST
 
 
@@ -249,6 +250,8 @@ void asteroid_move_all();
 Asteroid * asteroid_delete(Asteroid *asteroid);
 void asteroid_delete_all();
 void asteroid_populate(int32 n);
+bool asteroid_check_collision_on_blast(Asteroid *asteroid, Blast *blast);
+void asteroid_get_corners(Asteroid *asteroid, float *x1, float *y1, float *x2, float *y2);
 #endif // WAS_USING_BLAST
 
 
@@ -326,6 +329,12 @@ void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
  * @return     Boolean value indicating if game should keep running
  */
 bool run_game();
+
+
+/**
+ * @brief      Checks for collision between blasts and asteroids
+ */
+void check_blasts_on_asteroids();
 
 /*=====  End of Common function prototypes  ======*/
 

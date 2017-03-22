@@ -121,8 +121,6 @@ int8 blast_draw(Blast *blast) {
     float x2;
     float y2;
 
-    float dir;
-    float size;
     // Shouldn't draw if blast wasn't alive
     if (!blast->alive) {
         return -1;
@@ -130,12 +128,7 @@ int8 blast_draw(Blast *blast) {
 
     x1 = blast->x;
     y1 = blast->y;
-
-    dir = blast->direction;
-    size = blast->size;
-
-    x2 = x1 + size * cos(dir);
-    y2 = y1 - size * sin(dir);
+    blast_get_end_point(blast, &x2, &y2);
 
     // Draws the blast
     al_draw_line(x1, y1, x2, y2, blast->color, blast->thickness);
@@ -152,6 +145,18 @@ void blast_draw_all() {
     for (i = 0; i < num_blasts; ++i) {
         blast_draw(blasts[i]);
     }
+}
+
+/**
+ * @brief      Sets the end point coordinates of the blast on the addresses of the x- and y-variables
+ *
+ * @param      blast  The blast
+ * @param[out] x      Address to end-point x-coordinate
+ * @param[out] y      Address to end-point y-coordinate
+ */
+void blast_get_end_point(Blast *blast, float *x, float *y) {
+    *x = blast->x + blast->size * cos(blast->direction);
+    *y = blast->y - blast->size * sin(blast->direction);
 }
 
 /**

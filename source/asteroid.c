@@ -32,7 +32,7 @@
  */
 
 #define WAS_USING_ASTEROID
-#define WAS_USING_SHIP
+#define WAS_USING_BLAST
 #include "wasteroids.h"
 
 
@@ -101,8 +101,8 @@ Asteroid * asteroid_make_new_default(float x, float y, float direction, float sc
     ALLEGRO_COLOR color = ASTEROID_COLOR;
     float thickness = 3.0f;
 
-    x += SHIP_DIMENSION * (float) cos(direction);
-    y -= SHIP_DIMENSION * (float) sin(direction);
+    x += ASTEROID_DIMENSION * (float) cos(direction);
+    y -= ASTEROID_DIMENSION * (float) sin(direction);
 
     newAsteroid = asteroid_make_new(x, y, direction, scale, speed, alive,
                                     color, thickness);
@@ -124,18 +124,13 @@ int8 asteroid_draw(Asteroid *asteroid) {
     float x2;
     float y2;
 
-    float scale;
     // Shouldn't draw if asteroid wasn't alive
     if (!asteroid->alive) {
         return -1;
     }
 
-    scale = asteroid->scale;
     // For the sake of simplicity the asteroid will be a square
-    x1 = asteroid->x - scale * ASTEROID_DIMENSION;
-    y1 = asteroid->y - scale * ASTEROID_DIMENSION;
-    x2 = asteroid->x + scale * ASTEROID_DIMENSION;
-    y2 = asteroid->y + scale * ASTEROID_DIMENSION;
+    asteroid_get_corners(asteroid, &x1, &y1, &x2, &y2);
 
     // Draws the asteroid
     al_draw_filled_rectangle(x1, y1, x2, y2, ASTEROID_COLOR);
@@ -152,6 +147,22 @@ void asteroid_draw_all() {
     for (i = 0; i < num_asteroids; ++i) {
         asteroid_draw(asteroids[i]);
     }
+}
+
+/**
+ * @brief      Sets the corners of the asteroid on the addresses passed as arguments
+ *
+ * @param      asteroid  The asteroid
+ * @param[out] x1        Address to top left corner's x-coordinate
+ * @param[out] y1        Address to top left corner's y-coordinate
+ * @param[out] x2        Address to bottom right corner's x-coordinate
+ * @param[out] y2        Address to bottom right corner's y-coordinate
+ */
+void asteroid_get_corners(Asteroid *asteroid, float *x1, float *y1, float *x2, float *y2) {
+    *x1 = asteroid->x - asteroid->scale * ASTEROID_DIMENSION;
+    *y1 = asteroid->y - asteroid->scale * ASTEROID_DIMENSION;
+    *x2 = asteroid->x + asteroid->scale * ASTEROID_DIMENSION;
+    *y2 = asteroid->y + asteroid->scale * ASTEROID_DIMENSION;
 }
 
 /**
@@ -266,12 +277,12 @@ void asteroid_move_all() {
 void asteroid_populate(int32 n) {
     int32 i;
 
-    for (i = 0; i < n; ++i) {
-        float x;
-        float y;
-        float direction;
-        float scale;
+    float x;
+    float y;
+    float direction;
+    float scale;
 
+    for (i = 0; i < n; ++i) {
         // Randomly populates
         x = rand() % al_get_display_width(screen);
         y = rand() % al_get_display_height(screen);
@@ -281,4 +292,30 @@ void asteroid_populate(int32 n) {
         // Make new asteroid
         asteroid_make_new_default(x, y, direction, scale);
     }
+}
+
+
+bool asteroid_check_collision_on_blast(Asteroid *asteroid, Blast *blast) {
+    // Blast's end point
+    float x_blast;
+    float y_blast;
+
+    // Asteroid's corners
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+
+    // Gets coordinates
+    blast_get_end_point(blast, &x_blast, &y_blast);
+    asteroid_get_corners(asteroid, &x1, &y1, &x2, &y2);
+
+    // Checks for collision
+    // Could be way better
+    if (x_blast >= x1 && y_blast >= y1
+            && x_blast <= x2 && y_blast <= y2) {
+        return true;
+    }
+
+    return false;
 }

@@ -159,9 +159,13 @@ bool run_game(Ship *ship) {
     // Checks for timer event
     else if (ev.type == ALLEGRO_EVENT_TIMER) {
         // TODO Run game logic
+        // Move objects around
         ship_move(ship);
         blast_move_all();
         asteroid_move_all();
+
+        // Check for collision
+        check_blasts_on_asteroids();
         redraw = true;
     }
 
@@ -181,3 +185,23 @@ bool run_game(Ship *ship) {
     return true;
 }
 
+void check_blasts_on_asteroids() {
+    int32 i;
+
+    // For each blast
+    for (i = 0; i < num_blasts; ++i) {
+        // Check collision on asteroids
+        int32 j;
+        for (j = 0; j < num_asteroids; ++j) {
+            // If they collide
+            if (asteroid_check_collision_on_blast(asteroids[j], blasts[i])) {
+                // TODO
+                // asteroid_collided(asteroids[j]);
+                
+                // Deletes the objects
+                asteroid_delete(asteroids[j]);
+                blast_delete(blasts[i]);
+            }
+        }
+    }
+}

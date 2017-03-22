@@ -27,6 +27,9 @@
 
 /**
  * Main project file
+ * 
+ * TODO
+ * Improve it using threads
  */
 
 #define WAS_USING_INPUT

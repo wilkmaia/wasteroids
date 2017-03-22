@@ -37,12 +37,27 @@
 #include "wasteroids.h"
 
 
+/*=========================================
+=            Local definitions            =
+=========================================*/
+
+static const float alpha1 = 2.4150f;
+static const float size1 = 12.0416f;
+
+static const float alpha3 = 2.1588f;
+static const float size3 = 7.2111f;
+
+static const float alpha4 = 2.8966f;
+static const float size4 = 4.1231f;
+
 static void print_coords(float x1, float y1, float x2, float y2) {
     printf("\nCoords:\n");
     printf("(x1, y1) = (%.2f, %.2f)\n", x1, y1);
     printf("(x2, y2) = (%.2f, %.2f)\n", x2, y2);
     printf("\n");
 }
+
+/*=====  End of Local definitions  ======*/
 
 
 /**
@@ -98,38 +113,65 @@ Ship * ship_make_new_default() {
  * @return     0 for success or anything else for error
  */
 int8 ship_draw(Ship *ship) {
-    float x1;
-    float y1;
-    float x2;
-    float y2;
+    // 7 base points for ship drawing
+    float x[7];
+    float y[7];
+    /*
+     *    POINTS LOCATION
+     *    C stands for Center Point
+     *    
+     *          [0]
+     *    
+     *    
+     *           C
+     *     [3][4] [5][6]
+     *     
+     *    [1]         [2]
+     *
+     */
+
+    // Points are relative to center and ship's direction
+    float x_center;
+    float y_center;
+    float dir;
+
+    x_center = ship->x;
+    y_center = ship->y;
+    dir = ship->direction;
+
+    // Get base points
+    x[0] = x_center + 11.0f * cos(dir);
+    y[0] = y_center - 11.0f * sin(dir);
+
+    x[1] = x_center + size1 * (float) cos(dir + alpha1);
+    y[1] = y_center - size1 * (float) sin(dir + alpha1);
+
+    x[3] = x_center + size3 * (float) cos(dir + alpha3);
+    y[3] = y_center - size3 * (float) sin(dir + alpha3);
+
+    x[4] = x_center + size4 * (float) cos(dir + alpha4);
+    y[4] = y_center - size4 * (float) sin(dir + alpha4);
+
+    x[2] = x_center + size1 * (float) cos(dir - alpha1);
+    y[2] = y_center - size1 * (float) sin(dir - alpha1);
+
+    x[6] = x_center + size3 * (float) cos(dir - alpha3);
+    y[6] = y_center - size3 * (float) sin(dir - alpha3);
+
+    x[5] = x_center + size4 * (float) cos(dir - alpha4);
+    y[5] = y_center - size4 * (float) sin(dir - alpha4);
 
     // Draws first line
-    x1 = ship->x - 8.0f;
-    y1 = ship->y + 9.0f;
-    x2 = ship->x;
-    y2 = ship->y - 11.0f;
-    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+    al_draw_line(x[0], y[0], x[1], y[1], ship->color, ship->thickness);
 
     // Draws second line
-    x1 = ship->x + 8.0f;
-    y1 = ship->y + 9.0f;
-    x2 = ship->x;
-    y2 = ship->y - 11.0f;
-    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+    al_draw_line(x[0], y[0], x[2], y[2], ship->color, ship->thickness);
 
     // Draws third line
-    x1 = ship->x - 6.0f;
-    y1 = ship->y + 4.0f;
-    x2 = ship->x - 1.0f;
-    y2 = ship->y + 4.0f;
-    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+    al_draw_line(x[3], y[3], x[4], y[4], ship->color, ship->thickness);
 
     // Draws fourth line
-    x1 = ship->x + 6.0f;
-    y1 = ship->y + 4.0f;
-    x2 = ship->x + 1.0f;
-    y2 = ship->y + 4.0f;
-    al_draw_line(x1, y1, x2, y2, ship->color, ship->thickness);
+    al_draw_line(x[5], y[5], x[6], y[6], ship->color, ship->thickness);
 
     return 0;
 }
@@ -157,17 +199,17 @@ void ship_move(Ship *ship) {
 
     if (pressed_keys[ALLEGRO_KEY_UP]) {
         dx = ship->speed * cos(ship->direction);
-        dy = ship->speed * sin(ship->direction);
+        dy = - ship->speed * sin(ship->direction);
     }
     
-    if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
+    if (pressed_keys[ALLEGRO_KEY_LEFT]) {
         ship->direction += DIRECTION_STEP;
         if (ship->direction >= 2 * ALLEGRO_PI) {
             ship->direction = 0.0f + (ship->direction - 2 * ALLEGRO_PI);
         }
     }
 
-    if (pressed_keys[ALLEGRO_KEY_LEFT]) {
+    if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
         ship->direction -= DIRECTION_STEP;
         if (ship->direction < 0.0f) {
             ship->direction = 2 * ALLEGRO_PI  + ship->direction;

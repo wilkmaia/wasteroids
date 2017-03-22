@@ -45,7 +45,7 @@ static float FPS = 60.0f;
  */
 void input_init() {
     keybuf_len = 0;
-    keybuf_mutex = al_create_mutex();
+    // keybuf_mutex = al_create_mutex();
     
     timer = al_create_timer(1.0 / FPS);
     if (!timer) {
@@ -65,8 +65,8 @@ void input_init() {
  */
 void input_shutdown() {
     // Cleans input queue
-    al_destroy_mutex(keybuf_mutex);
-    keybuf_mutex = NULL;
+    // al_destroy_mutex(keybuf_mutex);
+    // keybuf_mutex = NULL;
 
     al_destroy_event_queue(input_queue);
     input_queue = NULL;

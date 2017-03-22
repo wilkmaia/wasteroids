@@ -76,8 +76,16 @@ Ship * ship_make_new(float x, float y, float direction, float speed,
 
 Ship * ship_make_new_default() {
     Ship * newShip;
-    newShip = ship_make_new(100, 100, 0, 1, true,
-                            al_map_rgb(255, 255, 255), 3.0f);
+    float x = 100.0f;
+    float y = 100.0f;
+    float direction = 0.0f;
+    float speed = 3.0f;
+    bool alive = true;
+    ALLEGRO_COLOR color = al_map_rgb(0, 255, 0);
+    float thickness = 3.0f;
+
+    newShip = ship_make_new(x, y, direction, speed, alive,
+                            color, thickness);
 
     return newShip;
 }
@@ -134,6 +142,38 @@ int8 ship_draw(Ship *ship) {
  * @return     Pointer to object. Should point to NULL if everything went ok.
  */
 Ship * ship_delete(Ship *ship) {
+    free(ship);
+    ship = NULL;
 
-    return NULL;
+    return ship;
+}
+
+void ship_move(Ship *ship) {
+    float dx;
+    float dy;
+
+    dx = 0.0f;
+    dy = 0.0f;
+
+    if (pressed_keys[ALLEGRO_KEY_UP]) {
+        dx = ship->speed * cos(ship->direction);
+        dy = ship->speed * sin(ship->direction);
+    }
+    
+    if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
+        ship->direction += DIRECTION_STEP;
+        if (ship->direction >= 2 * ALLEGRO_PI) {
+            ship->direction = 0.0f + (ship->direction - 2 * ALLEGRO_PI);
+        }
+    }
+
+    if (pressed_keys[ALLEGRO_KEY_LEFT]) {
+        ship->direction -= DIRECTION_STEP;
+        if (ship->direction < 0.0f) {
+            ship->direction = 2 * ALLEGRO_PI  + ship->direction;
+        }
+    }
+
+    ship->x += dx;
+    ship->y += dy;
 }

@@ -30,9 +30,10 @@
  */
 
 #define WAS_USING_INPUT
+#define WAS_USING_SHIP
 #include "wasteroids.h"
 
-// Global variables definitions
+// Project variables definitions
 struct ALLEGRO_DISPLAY *screen;
 struct ALLEGRO_FONT *font;
 struct ALLEGRO_FONT *font_video;
@@ -91,25 +92,56 @@ void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
     al_set_config_value(cfg, section, name, val);
 }
 
-bool run_game() {
+bool run_game(Ship *ship) {
     ALLEGRO_EVENT ev;
     input_wait_for_event(&ev);
     bool redraw = false;
 
+    // Checks for key pressed
     if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (ev.keyboard.keycode) {
             case ALLEGRO_KEY_ESCAPE:
                 return false;
                 break;
+
+            case ALLEGRO_KEY_UP:
+            case ALLEGRO_KEY_DOWN:
+            case ALLEGRO_KEY_LEFT:
+            case ALLEGRO_KEY_RIGHT:
+                pressed_keys[ev.keyboard.keycode] = true;
+                break;
+
+            default:
+                break;
         }
     }
+    // Check for key released
+    else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
+        switch (ev.keyboard.keycode) {
+            case ALLEGRO_KEY_UP:
+            case ALLEGRO_KEY_DOWN:
+            case ALLEGRO_KEY_LEFT:
+            case ALLEGRO_KEY_RIGHT:
+                pressed_keys[ev.keyboard.keycode] = false;
+                break;
+        }
+    }
+    // Checks for timer event
     else if (ev.type == ALLEGRO_EVENT_TIMER) {
         // TODO Run game logic
+        ship_move(ship);
         redraw = true;
     }
 
     if (redraw && input_is_queue_empty()) {
         redraw = false;
+
+        // Redraws objects on screen
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+        
+        ship_draw(ship);
+
+        al_flip_display();
     }
 
     return true;

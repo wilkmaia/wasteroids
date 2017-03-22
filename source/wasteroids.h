@@ -35,6 +35,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
+#include <math.h>
 #include <time.h>
 
 /*=====  End of Standard Library includes  ======*/
@@ -94,7 +95,7 @@ typedef uint64_t uint64;
 =            WAsteroids' specifics            =
 =============================================*/
 
-// Global variables
+// Globals
 
 /**
  * @brief      screen handler
@@ -116,6 +117,11 @@ extern struct ALLEGRO_FONT *font;
  */
 extern struct ALLEGRO_FONT *font_video;
 
+/**
+ * Step for angle change in radians
+ */
+#define DIRECTION_STEP 0.05f
+
 
 // Ship specifics
 #ifdef WAS_USING_SHIP
@@ -135,6 +141,7 @@ Ship * ship_make_new(float x, float y, float direction, float speed,
 Ship * ship_make_new_default();
 int8 ship_draw(Ship *ship);
 Ship * ship_delete(Ship *ship);
+void ship_move(Ship *ship);
 #endif // WAS_USING_SHIP
 
 
@@ -224,6 +231,11 @@ void set_config_int(ALLEGRO_CONFIG *cfg, const char *section,
 void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
                               const char *name, const char *val);
 
+/**
+ * @brief      Runs game until ESC key is pressed
+ *
+ * @return     Boolean value indicating if game should keep running
+ */
 bool run_game();
 
 /*=====  End of Common function prototypes  ======*/

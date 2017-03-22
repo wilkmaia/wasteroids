@@ -8,7 +8,7 @@ set (wasteroids_VERSION_MAJOR 0)
 set (wasteroids_VERSION_MINOR 1)
 
 # Add Allegro dependency
-set (GCC_COVERAGE_LINK_FLAGS "-lallegro -lallegro_primitives")
+set (GCC_COVERAGE_LINK_FLAGS "-lallegro -lallegro_primitives -lm")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
 
 add_executable(wasteroids.out

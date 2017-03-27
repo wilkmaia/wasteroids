@@ -48,6 +48,8 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_image.h>
 
 /*=====  End of Allegro  ======*/
 
@@ -108,14 +110,9 @@ extern struct ALLEGRO_DISPLAY *screen;
 extern bool pressed_keys[ALLEGRO_KEY_MAX];
 
 /**
- * @brief      font struct
+ * @brief      holds count of the current score
  */
-extern struct ALLEGRO_FONT *font;
-
-/**
- * @brief      video font struct
- */
-extern struct ALLEGRO_FONT *font_video;
+extern uint32 score_count;
 
 /**
  * @brief      Max possible angle
@@ -126,13 +123,6 @@ extern const float MAX_ANGLE;
  * Step for angle change in radians
  */
 #define DIRECTION_STEP 0.05f
-
-
-/*----------  POINT  ----------*/
-typedef struct {
-    float x;
-    float y;
-} Point;
 
 
 /*----------  SHIP  ----------*/
@@ -274,6 +264,32 @@ void asteroid_get_corners(Asteroid *asteroid, float *x1, float *y1, float *x2, f
 void asteroid_was_hit(Asteroid *asteroid);
 bool asteroid_check_collision_on_ship(Asteroid *asteroid, Ship *ship);
 #endif // WAS_USING_BLAST
+
+
+/*----------  TEXT  ----------*/
+
+#ifdef WAS_USING_TEXT
+#define TEXT_MESSAGE_LENGTH 64
+typedef struct {
+    ALLEGRO_FONT *font;
+    float scale;
+    float x;
+    float y;
+    ALLEGRO_COLOR color;
+    char msg[TEXT_MESSAGE_LENGTH];
+} text;
+
+/**
+ * @brief      Score text
+ */
+extern text *score;
+
+void text_draw(text *t);
+text * text_delete(text *t);
+text * text_make_new(const char *font, float scale, float x, float y, ALLEGRO_COLOR color, const char *msg);
+text * text_make_new_default(float scale, float x, float y, const char *msg);
+void text_update_msg(text *t, const char *msg);
+#endif // WAS_USING_TEXT
 
 
 /*=====  End of WAsteroids' specifics  ======*/

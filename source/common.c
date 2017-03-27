@@ -33,6 +33,7 @@
 #define WAS_USING_SHIP
 #define WAS_USING_BLAST
 #define WAS_USING_ASTEROID
+#define WAS_USING_TEXT
 #include "wasteroids.h"
 
 
@@ -74,6 +75,10 @@ const float VERTICES[] = {
 };
 
 bool is_game_over = false;
+
+text *score = NULL;
+
+uint32 score_count = 0;
 
 /*=====  End of Project global variables and constants  ======*/
 
@@ -209,6 +214,7 @@ bool run_game() {
         ship_draw(ship);
         blast_draw_all();
         asteroid_draw_all();
+        text_draw(score);
 
         al_flip_display();
     }
@@ -236,11 +242,18 @@ void check_blasts_on_asteroids() {
         for (j = 0; j < num_asteroids; ++j) {
             // If they collide
             if (asteroid_check_collision_on_blast(asteroids[j], blasts[i])) {
+                char msg[TEXT_MESSAGE_LENGTH] = {};
+
                 // Handle the asteroid collision
                 asteroid_was_hit(asteroids[j]);
 
                 // Deletes blast
                 blast_delete(blasts[i]);
+
+                // Increases score
+                score_count += 100;
+                sprintf(msg, "Score: %d", score_count);
+                text_update_msg(score, msg);
             }
         }
     }

@@ -41,6 +41,7 @@
 #define WAS_USING_SHIP
 #define WAS_USING_BLAST
 #define WAS_USING_ASTEROID
+#define WAS_USING_TEXT
 #include "wasteroids.h"
 
 
@@ -65,6 +66,14 @@
     
     if (!al_init_primitives_addon()) {
         error("Couldn't initialise Allegro Primitives Addon");
+    }
+
+    if (!al_init_font_addon()) {
+        error("Couldn't initialise Allegro Font Addon");
+    }
+
+    if (!al_init_image_addon()) {
+        error("Couldn't initialise Allegro Image Addon");
     }
 
     display_flags = ALLEGRO_GENERATE_EXPOSE_EVENTS;
@@ -152,6 +161,10 @@
     // Asteroids
     asteroid_populate(5);
 
+    // Text
+    score = text_make_new_default(3, 100, 100, "Score: ");
+    score_count = 0;
+
 
     /*=================================
     =            Game loop            =
@@ -163,18 +176,19 @@
     =            Game objects cleanup            =
     ============================================*/
     ship_delete(ship);
+    text_delete(score);
     blast_delete_all();
     asteroid_delete_all();
+    hiscore_shutdown();
+    input_shutdown();
 
 
     /*=======================================
     =            Allegro Cleanup            =
     =========================================*/
-    hiscore_shutdown();
-    input_shutdown();
-
-    // al_destroy_font(font);
-    // al_destroy_font(font_video);
+    al_shutdown_primitives_addon();
+    al_shutdown_font_addon();
+    al_shutdown_image_addon();
 
 
     return 0;

@@ -43,6 +43,7 @@
 #define WAS_USING_ASTEROID
 #include "wasteroids.h"
 
+
  int main(int argc, char *argv[]) {
     int8 i;
     int32 display_flags;

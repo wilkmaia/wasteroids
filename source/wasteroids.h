@@ -128,6 +128,13 @@ extern const float MAX_ANGLE;
 #define DIRECTION_STEP 0.05f
 
 
+/*----------  POINT  ----------*/
+typedef struct {
+    float x;
+    float y;
+} Point;
+
+
 /*----------  SHIP  ----------*/
 
 #ifdef WAS_USING_SHIP
@@ -221,6 +228,8 @@ void blast_get_end_point(Blast *blast, float *x, float *y);
 
 /*----------  ASTEROID  ----------*/
 
+#define NUM_VERTICES 12
+
 #ifdef WAS_USING_ASTEROID
 typedef struct {
     float x;
@@ -242,6 +251,7 @@ typedef struct {
 extern const float ASTEROID_DIMENSION;
 extern Asteroid *(asteroids[ASTEROID_MAX]);
 extern int32 num_asteroids;
+extern const float VERTICES[];
 
 Asteroid * asteroid_make_new(float x, float y, float direction, float scale, float speed,
                              bool alive, ALLEGRO_COLOR color, float thickness);

@@ -36,20 +36,6 @@
 #include "wasteroids.h"
 
 
-/*=========================================
-=            Local definitions            =
-=========================================*/
-
-static void print_coords(float x1, float y1, float x2, float y2) {
-    printf("\nCoords:\n");
-    printf("(x1, y1) = (%.2f, %.2f)\n", x1, y1);
-    printf("(x2, y2) = (%.2f, %.2f)\n", x2, y2);
-    printf("\n");
-}
-
-/*=====  End of Local definitions  ======*/
-
-
 /**
  * @brief      Creates a new blast
  *
@@ -115,23 +101,29 @@ Blast * blast_make_new_default(float x, float y, float direction) {
  * @return     0 for success or anything else for error
  */
 int8 blast_draw(Blast *blast) {
-    // Blast initial and end points
-    float x1;
-    float y1;
-    float x2;
-    float y2;
+    ALLEGRO_TRANSFORM transform;
+    const ALLEGRO_TRANSFORM * prevTransform;
 
     // Shouldn't draw if blast wasn't alive
     if (!blast->alive) {
         return -1;
     }
+    // Saves current transform state
+    prevTransform = al_get_current_transform();
 
-    x1 = blast->x;
-    y1 = blast->y;
-    blast_get_end_point(blast, &x2, &y2);
+    // Transforms based on blast info
+    al_identity_transform(&transform);
+    al_rotate_transform(&transform, -blast->direction + ALLEGRO_PI / 2.0f);
+    al_translate_transform(&transform, blast->x, blast->y);
+    al_use_transform(&transform);
 
-    // Draws the blast
-    al_draw_line(x1, y1, x2, y2, blast->color, blast->thickness);
+    // Draws blast
+    al_draw_line(0, -11, 0, -11 - blast->size, blast->color, blast->thickness);
+
+    // Reloads previous transform state
+    if (prevTransform != NULL) {
+        al_use_transform(prevTransform);
+    }
 
     return 0;
 }

@@ -37,20 +37,6 @@
 #include "wasteroids.h"
 
 
-/*=========================================
-=            Local definitions            =
-=========================================*/
-
-static void print_coords(float x1, float y1, float x2, float y2) {
-    printf("\nCoords:\n");
-    printf("(x1, y1) = (%.2f, %.2f)\n", x1, y1);
-    printf("(x2, y2) = (%.2f, %.2f)\n", x2, y2);
-    printf("\n");
-}
-
-/*=====  End of Local definitions  ======*/
-
-
 /**
  * @brief      Creates a new asteroid
  *
@@ -102,9 +88,6 @@ Asteroid * asteroid_make_new_default(float x, float y, float direction, float sc
     ALLEGRO_COLOR color = ASTEROID_COLOR;
     float thickness = 3.0f;
 
-    x += ASTEROID_DIMENSION * (float) cos(direction);
-    y -= ASTEROID_DIMENSION * (float) sin(direction);
-
     newAsteroid = asteroid_make_new(x, y, direction, scale, speed, alive,
                                     color, thickness);
 
@@ -119,22 +102,36 @@ Asteroid * asteroid_make_new_default(float x, float y, float direction, float sc
  * @return     0 for success or anything else for error
  */
 int8 asteroid_draw(Asteroid *asteroid) {
-    // Asteroid opposite corners
-    float x1;
-    float y1;
-    float x2;
-    float y2;
+    int32 i;
+
+    ALLEGRO_TRANSFORM transform;
+    const ALLEGRO_TRANSFORM * prevTransform;
 
     // Shouldn't draw if asteroid wasn't alive
     if (!asteroid->alive) {
         return -1;
     }
 
-    // For the sake of simplicity the asteroid will be a square
-    asteroid_get_corners(asteroid, &x1, &y1, &x2, &y2);
+    // Saves current transform state
+    prevTransform = al_get_current_transform();
+
+    // Transforms based on asteroid info
+    al_identity_transform(&transform);
+    al_scale_transform(&transform, asteroid->scale, asteroid->scale);
+    al_rotate_transform(&transform, -asteroid->direction + ALLEGRO_PI / 2.0f);
+    al_translate_transform(&transform, asteroid->x, asteroid->y);
+    al_use_transform(&transform);
 
     // Draws the asteroid
-    al_draw_filled_rectangle(x1, y1, x2, y2, ASTEROID_COLOR);
+    for (i = 0; i < NUM_VERTICES - 1; ++i) {
+        al_draw_line(VERTICES[2*i], VERTICES[2*i + 1], VERTICES[2*(i+1)], VERTICES[2*(i+1) + 1], asteroid->color, asteroid->thickness);
+    }
+    al_draw_line(VERTICES[0], VERTICES[1], VERTICES[2*i], VERTICES[2*i + 1], asteroid->color, asteroid->thickness);
+
+    // Reloads previous transform state
+    if (prevTransform != NULL) {
+        al_use_transform(prevTransform);
+    }
 
     return 0;
 }

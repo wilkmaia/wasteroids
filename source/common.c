@@ -58,6 +58,21 @@ const float ASTEROID_DIMENSION = 20.0f;
 
 const float MAX_ANGLE = 2.0f * (float) ALLEGRO_PI;
 
+const float VERTICES[] = {
+    -20, 20,
+    -25, 5,
+    -25, -10,
+    -5, -10,
+    -10, -20,
+    5, -20,
+    20, -10,
+    20, -5,
+    0, 0,
+    20, 10,
+    10, 20,
+    0, 15
+};
+
 /*=====  End of Project global variables and constants  ======*/
 
 
@@ -227,6 +242,7 @@ void check_ship_on_asteroids() {
     for (i = 0; i < num_asteroids; ++i) {
         if (asteroid_check_collision_on_ship(asteroids[i], ship)) {
             // What to do when they collide?
+            printf("Collided! %d\n", i);
         }
     }
 }

@@ -45,16 +45,13 @@ static const float alpha1 = ALLEGRO_PI * 165.0f / 180.0f;
 static const float alpha3 = ALLEGRO_PI * 165.0f / 180.0f;
 static const float alpha4 = ALLEGRO_PI * 175.0f / 180.0f;
 
-static void print_coords(float x1, float y1, float x2, float y2) {
-    printf("\nCoords:\n");
-    printf("(x1, y1) = (%.2f, %.2f)\n", x1, y1);
-    printf("(x2, y2) = (%.2f, %.2f)\n", x2, y2);
-    printf("\n");
-}
 
 /*=====  End of Local definitions  ======*/
 
 
+/**
+ * @brief      Initialize ship
+ */
 void ship_init() {
     ship = ship_make_new_default();
 }
@@ -119,35 +116,34 @@ Ship * ship_make_new_default() {
  * @return     0 for success or anything else for error
  */
 int8 ship_draw(Ship *ship) {
-    /* 7 base points for ship drawing
-     *
-     *    POINTS LOCATION
-     *    C stands for Center Point
-     *    
-     *          [0]
-     *    
-     *    
-     *           
-     *     [3][4] [5][6]
-     *     
-     *    [1]         [2]
-     *
-     */
-    float x[7];
-    float y[7];
+    ALLEGRO_TRANSFORM transform;
+    const ALLEGRO_TRANSFORM * prevTransform;
 
     // Shouldn't draw if ship wasn't alive
     if (!ship->alive) {
         return -1;
     }
 
-    ship_get_base_points(ship, x, y);
+    // Saves current transform state
+    prevTransform = al_get_current_transform();
 
-    // Draws the four line segments
-    al_draw_line(x[0], y[0], x[1], y[1], ship->color, ship->thickness);
-    al_draw_line(x[0], y[0], x[2], y[2], ship->color, ship->thickness);
-    al_draw_line(x[3], y[3], x[4], y[4], ship->color, ship->thickness);
-    al_draw_line(x[5], y[5], x[6], y[6], ship->color, ship->thickness);
+    // Transforms based on ship info
+    al_identity_transform(&transform);
+    al_scale_transform(&transform, ship->scale, ship->scale);
+    al_rotate_transform(&transform, -ship->direction + ALLEGRO_PI / 2.0f);
+    al_translate_transform(&transform, ship->x, ship->y);
+    al_use_transform(&transform);
+    
+    // Draws ship
+    al_draw_line(-8, 9, 0, -11, ship->color, ship->thickness);
+    al_draw_line(0, -11, 8, 9, ship->color, ship->thickness);
+    al_draw_line(-6, 4, -1, 4, ship->color, ship->thickness);
+    al_draw_line(6, 4, 1, 4, ship->color, ship->thickness);
+
+    // Reloads previous transform state
+    if (prevTransform != NULL) {
+        al_use_transform(prevTransform);
+    }
 
     return 0;
 }

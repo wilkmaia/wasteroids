@@ -79,13 +79,13 @@ typedef uint64_t uint64;
     #define NUL 0
 #endif // NUL
 
-#ifndef FALSE
-    #define FALSE (0 != 0)
-#endif // FALSE
+#ifndef false
+    #define false (0 != 0)
+#endif // false
 
-#ifndef TRUE
-    #define TRUE (0 == 0)
-#endif // TRUE
+#ifndef true
+    #define true (0 == 0)
+#endif // true
 
 /*=====  End of Default datatypes  ======*/
 
@@ -147,9 +147,13 @@ typedef struct {
     bool alive;
     ALLEGRO_COLOR color;
     float thickness;
+    int8 lives;
+    bool can_be_hit;
+    int8 can_be_hit_count;
 } Ship;
 
 #define SHIP_COLOR al_map_rgb(0, 255, 0)
+#define SHIP_LIVES 3
 
 extern const float SHIP_DIMENSION;
 extern Ship *ship;
@@ -162,6 +166,7 @@ int8 ship_draw(Ship *ship);
 void ship_get_base_points(Ship *ship, float *x, float *y);
 Ship * ship_delete(Ship *ship);
 void ship_move(Ship *ship);
+int8 ship_hit(Ship *ship);
 #endif // WAS_USING_SHIP
 
 
@@ -370,6 +375,11 @@ void check_blasts_on_asteroids();
  * @brief      Checks for collision betweein ship and asteroids
  */
 void check_ship_on_asteroids();
+
+/**
+ * @brief      Finishes game
+ */
+void game_over();
 
 /*=====  End of Common function prototypes  ======*/
 

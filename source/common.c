@@ -73,6 +73,8 @@ const float VERTICES[] = {
     0, 15
 };
 
+bool is_game_over = false;
+
 /*=====  End of Project global variables and constants  ======*/
 
 
@@ -174,7 +176,8 @@ bool run_game() {
         }
     }
     // Checks for timer event
-    else if (ev.type == ALLEGRO_EVENT_TIMER) {
+    // If game is over, there's no update on screen
+    else if (ev.type == ALLEGRO_EVENT_TIMER && !is_game_over) {
         // TODO Run game logic
         // Move objects around
         ship_move(ship);
@@ -184,6 +187,14 @@ bool run_game() {
         // Check for collision
         check_blasts_on_asteroids();
         check_ship_on_asteroids(ship);
+
+        if (!ship->can_be_hit) {
+            ++(ship->can_be_hit_count);
+            if (ship->can_be_hit_count >= 60) {
+                ship->can_be_hit = true;
+                ship->can_be_hit_count = 0;
+            }
+        }
 
         // Sets flag for screen redrawing
         redraw = true;
@@ -237,12 +248,21 @@ void check_blasts_on_asteroids() {
 
 void check_ship_on_asteroids() {
     int32 i;
+    int8 lives;
 
     // For each asteroid
     for (i = 0; i < num_asteroids; ++i) {
-        if (asteroid_check_collision_on_ship(asteroids[i], ship)) {
-            // What to do when they collide?
-            printf("Collided! %d\n", i);
+        if (ship->can_be_hit && asteroid_check_collision_on_ship(asteroids[i], ship)) {
+            lives = ship_hit(ship);
+
+            // Checks for game over
+            if (lives <= 0) {
+                game_over();
+            }
         }
     }
+}
+
+void game_over() {
+    is_game_over = true;
 }

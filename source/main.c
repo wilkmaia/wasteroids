@@ -31,9 +31,9 @@
  * TODO
  * Improve it using threads
  * Handle ship-asteroid collision
- * Handle points
+ * Handle score
  * Handle scoreboard
- * Display points on screen
+ * Display score on screen
  */
 
 #define WAS_USING_INPUT

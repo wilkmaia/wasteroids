@@ -82,6 +82,7 @@ Ship * ship_make_new(float x, float y, float direction, float scale, float speed
     newShip->alive = alive;
     newShip->color = color;
     newShip->thickness = thickness;
+    newShip->lives = SHIP_LIVES;
 
     return newShip;
 }
@@ -135,10 +136,20 @@ int8 ship_draw(Ship *ship) {
     al_use_transform(&transform);
     
     // Draws ship
-    al_draw_line(-8, 9, 0, -11, ship->color, ship->thickness);
-    al_draw_line(0, -11, 8, 9, ship->color, ship->thickness);
-    al_draw_line(-6, 4, -1, 4, ship->color, ship->thickness);
-    al_draw_line(6, 4, 1, 4, ship->color, ship->thickness);
+    if (!ship->can_be_hit) {
+        if (!((ship->can_be_hit_count / 7) % 2)) {
+            al_draw_line(-8, 9, 0, -11, al_map_rgb(255, 255, 0), ship->thickness);
+            al_draw_line(0, -11, 8, 9, al_map_rgb(255, 255, 0), ship->thickness);
+            al_draw_line(-6, 4, -1, 4, al_map_rgb(255, 255, 0), ship->thickness);
+            al_draw_line(6, 4, 1, 4, al_map_rgb(255, 255, 0), ship->thickness);
+        }
+    }
+    else {
+        al_draw_line(-8, 9, 0, -11, ship->color, ship->thickness);
+        al_draw_line(0, -11, 8, 9, ship->color, ship->thickness);
+        al_draw_line(-6, 4, -1, 4, ship->color, ship->thickness);
+        al_draw_line(6, 4, 1, 4, ship->color, ship->thickness);
+    }
 
     // Reloads previous transform state
     if (prevTransform != NULL) {
@@ -254,4 +265,23 @@ void ship_move(Ship *ship) {
 
     ship->x += dx;
     ship->y += dy;
+}
+
+/**
+ * @brief      Handles ship being hit by asteroid
+ */
+int8 ship_hit(Ship *ship) {
+    // Ship loses a life
+    --(ship->lives);
+
+    // Ship redrawn to center of screen
+    // Keeps being redrawn until there's no collision there
+    ship->alive = true;
+    ship->can_be_hit = false;
+    ship->can_be_hit_count = 0;
+    ship->x = al_get_display_width(screen) / 2.0f;
+    ship->y = al_get_display_height(screen) / 2.0f;
+    ship->direction = ALLEGRO_PI / 2.0f;
+
+    return ship->lives;
 }

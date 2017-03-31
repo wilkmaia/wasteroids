@@ -41,9 +41,9 @@
 =            Local definitions            =
 =========================================*/
 
-static const float alpha1 = ALLEGRO_PI * 165.0f / 180.0f;
-static const float alpha3 = ALLEGRO_PI * 165.0f / 180.0f;
-static const float alpha4 = ALLEGRO_PI * 175.0f / 180.0f;
+static const float alpha1 = (float)ALLEGRO_PI * 165.0f / 180.0f;
+static const float alpha3 = (float)ALLEGRO_PI * 165.0f / 180.0f;
+static const float alpha4 = (float)ALLEGRO_PI * 175.0f / 180.0f;
 
 
 /*=====  End of Local definitions  ======*/
@@ -96,7 +96,7 @@ Ship * ship_make_new_default() {
     Ship * newShip;
     float x = al_get_display_width(screen) / 2.0f;
     float y = al_get_display_height(screen) / 2.0f;
-    float direction = ALLEGRO_PI / 2.0f;
+    float direction = (float)ALLEGRO_PI / 2.0f;
     float scale = 2.0f;
     float speed = 3.0f;
     bool alive = true;
@@ -131,7 +131,7 @@ int8 ship_draw(Ship *ship) {
     // Transforms based on ship info
     al_identity_transform(&transform);
     al_scale_transform(&transform, ship->scale, ship->scale);
-    al_rotate_transform(&transform, -ship->direction + ALLEGRO_PI / 2.0f);
+    al_rotate_transform(&transform, -ship->direction + (float)ALLEGRO_PI / 2.0f);
     al_translate_transform(&transform, ship->x, ship->y);
     al_use_transform(&transform);
     
@@ -159,6 +159,12 @@ int8 ship_draw(Ship *ship) {
     return 0;
 }
 
+/**
+ * @brief       Get ship's base points
+ * @param       ship    Ship element
+ * @param       x       Array to hold the x elements
+ * @param       y       Array to hold the y elements
+ */
 void ship_get_base_points(Ship *ship, float *x, float *y) {
     float x_center;
     float y_center;
@@ -245,8 +251,8 @@ void ship_move(Ship *ship) {
     dy = 0.0f;
 
     if (pressed_keys[ALLEGRO_KEY_UP]) {
-        dx = ship->speed * cos(ship->direction);
-        dy = - ship->speed * sin(ship->direction);
+        dx = ship->speed * (float)cos(ship->direction);
+        dy = - ship->speed * (float)sin(ship->direction);
     }
     
     if (pressed_keys[ALLEGRO_KEY_LEFT]) {
@@ -281,7 +287,7 @@ int8 ship_hit(Ship *ship) {
     ship->can_be_hit_count = 0;
     ship->x = al_get_display_width(screen) / 2.0f;
     ship->y = al_get_display_height(screen) / 2.0f;
-    ship->direction = ALLEGRO_PI / 2.0f;
+    ship->direction = (float)ALLEGRO_PI / 2.0f;
 
     return ship->lives;
 }

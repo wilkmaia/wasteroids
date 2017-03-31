@@ -83,7 +83,7 @@ Asteroid * asteroid_make_new(float x, float y, float direction, float scale, flo
  */
 Asteroid * asteroid_make_new_default(float x, float y, float direction, float scale) {
     Asteroid * newAsteroid;
-    float speed = 5.0f - scale;
+    float speed = asteroid_calc_speed(scale);
     bool alive = true;
     ALLEGRO_COLOR color = ASTEROID_COLOR;
     float thickness = 3.0f;
@@ -118,7 +118,7 @@ int8 asteroid_draw(Asteroid *asteroid) {
     // Transforms based on asteroid info
     al_identity_transform(&transform);
     al_scale_transform(&transform, asteroid->scale, asteroid->scale);
-    al_rotate_transform(&transform, -asteroid->direction + ALLEGRO_PI / 2.0f);
+    al_rotate_transform(&transform, -asteroid->direction + (float)ALLEGRO_PI / 2.0f);
     al_translate_transform(&transform, asteroid->x, asteroid->y);
     al_use_transform(&transform);
 
@@ -232,25 +232,21 @@ void asteroid_move(Asteroid *asteroid) {
     width = al_get_display_width(screen);
     height = al_get_display_height(screen);
     if (x_center > width) {
-        x_center = 0;
         asteroid->x = 0;
     }
     else if (x_center < 0) {
-        x_center = width;
         asteroid->x = width;
     }
 
     if (y_center > height) {
-        y_center = 0;
         asteroid->y = 0;
     }
     else if (y_center < 0) {
-        y_center = height;
         asteroid->y = height;
     }
 
-    dx = asteroid->speed * cos(asteroid->direction);
-    dy = - asteroid->speed * sin(asteroid->direction);
+    dx = asteroid->speed * (float)cos(asteroid->direction);
+    dy = - asteroid->speed * (float)sin(asteroid->direction);
 
     asteroid->x += dx;
     asteroid->y += dy;
@@ -363,12 +359,12 @@ void asteroid_was_hit(Asteroid *asteroid) {
 /**
  * @brief      Calculates the speed of an asteroid
  *
- * @param      asteroid  The asteroid
+ * @param      scale  The asteroid's scale
  *
  * @return     Speed value
  */
-float asteroid_calc_speed(Asteroid *asteroid) {
-    return 5.0f - asteroid->scale;
+float asteroid_calc_speed(float scale) {
+    return 5.0f - scale;
 }
 
 /**

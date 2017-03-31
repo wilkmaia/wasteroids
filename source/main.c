@@ -30,7 +30,6 @@
  * 
  * TODO
  * Improve it using threads
- * Handle ship-asteroid collision
  * Handle score
  * Handle scoreboard
  * Display score on screen
@@ -52,7 +51,7 @@
     int32 width;
     int32 height;
 
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
 
     /*==========================================
     =            Initialise Allegro            =

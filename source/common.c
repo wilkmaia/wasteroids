@@ -43,7 +43,6 @@
 
 struct ALLEGRO_DISPLAY *screen;
 struct ALLEGRO_FONT *font;
-struct ALLEGRO_FONT *font_video;
 bool pressed_keys[ALLEGRO_KEY_MAX];
 
 Ship *ship;
@@ -147,7 +146,6 @@ bool run_game() {
             // Finishes the game
             case ALLEGRO_KEY_ESCAPE:
                 return false;
-                break;
 
             // Move ship around
             case ALLEGRO_KEY_UP:
@@ -178,6 +176,9 @@ bool run_game() {
             case ALLEGRO_KEY_RIGHT:
                 pressed_keys[ev.keyboard.keycode] = false;
                 break;
+
+            default:
+                break;
         }
     }
     // Checks for timer event
@@ -191,7 +192,7 @@ bool run_game() {
 
         // Check for collision
         check_blasts_on_asteroids();
-        check_ship_on_asteroids(ship);
+        check_ship_on_asteroids();
 
         if (!ship->can_be_hit) {
             ++(ship->can_be_hit_count);
@@ -206,8 +207,6 @@ bool run_game() {
     }
 
     if (redraw && input_is_queue_empty()) {
-        redraw = false;
-
         // Redraws objects on screen
         al_clear_to_color(al_map_rgb(0, 0, 0));
         

@@ -202,6 +202,10 @@ typedef struct {
  * Max number of live blasts
  */
 #define BLAST_MAX 30
+
+/**
+ * Blast color on allegro format
+ */
 #define BLAST_COLOR al_map_rgb(255, 0, 0)
 
 extern Blast *(blasts[BLAST_MAX]);
@@ -223,9 +227,9 @@ void blast_get_end_point(Blast *blast, float *x, float *y);
 
 /*----------  ASTEROID  ----------*/
 
+#ifdef WAS_USING_ASTEROID
 #define NUM_VERTICES 12
 
-#ifdef WAS_USING_ASTEROID
 typedef struct {
     float x;
     float y;
@@ -241,6 +245,10 @@ typedef struct {
  * Max number of live blasts
  */
 #define ASTEROID_MAX 100
+
+/**
+ * Asteroid color on allegro format
+ */
 #define ASTEROID_COLOR al_map_rgb(0, 0, 255)
 
 extern const float ASTEROID_DIMENSION;
@@ -253,7 +261,7 @@ Asteroid * asteroid_make_new(float x, float y, float direction, float scale, flo
 Asteroid * asteroid_make_new_default(float x, float y, float direction, float scale);
 int8 asteroid_draw(Asteroid *asteroid);
 void asteroid_draw_all();
-float asteroid_calc_speed(Asteroid *asteroid);
+float asteroid_calc_speed(float scale);
 void asteroid_move(Asteroid *asteroid);
 void asteroid_move_all();
 Asteroid * asteroid_delete(Asteroid *asteroid);
@@ -307,10 +315,12 @@ void text_update_msg(text *t, const char *msg);
  */
 void error(char *msg);
 
+
 /**
  * @brief      Prints usage message
  */
 void print_usage_message();
+
 
 /**
  * @brief      Gets configuration value (number)
@@ -367,6 +377,7 @@ void set_config_string(ALLEGRO_CONFIG *cfg, const char *section,
  */
 bool run_game();
 
+
 /**
  * @brief      Checks if point (x, y) is inside the rectangle defined by the corner points
  *
@@ -387,10 +398,12 @@ bool common_check_collision(float x, float y, float corner_x1, float corner_y1,
  */
 void check_blasts_on_asteroids();
 
+
 /**
- * @brief      Checks for collision betweein ship and asteroids
+ * @brief      Checks for collision between ship and asteroids
  */
 void check_ship_on_asteroids();
+
 
 /**
  * @brief      Finishes game
